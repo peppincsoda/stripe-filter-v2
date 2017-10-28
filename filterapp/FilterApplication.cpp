@@ -190,57 +190,78 @@ namespace sfv2 {
         // Convert to grayscale
         cv::cvtColor(*input_data.frame, img, cv::COLOR_BGR2GRAY);
 
-        // Select ROI
-        const auto roi_p = settings_->roiTopLeft();
-        const auto roi_size = settings_->roiSize();
-        // TODO: check ROI
-        cv::Mat roi_img = img(cv::Rect(roi_p.x(),
-                                       roi_p.y(),
-                                       roi_size.width(),
-                                       roi_size.height()));
-
-        // Apply required low-pass filters
-        if (settings_->useMedian()) {
-            const auto ksize = settings_->medianKSize();
-            if (3 <= ksize && (ksize % 2) == 1) {
-                cv::medianBlur(roi_img, roi_img, ksize);
-            } else {
-                // TODO:
-            }
+        // Get ROI parameters
+        auto roi_p = settings_->roiTopLeft();
+        auto roi_size = settings_->roiSize();
+        // Ensure that the ROI width and height are positive
+        if (roi_size.width() < 0) {
+            roi_size.setWidth(-roi_size.width());
+            roi_p.setX(roi_p.x() - roi_size.width());
         }
-
-        if (settings_->useGaussian()) {
-            const auto ksize = settings_->gaussianKSize();
-            const auto sigma = settings_->gaussianSigma();
-            if (3 <= ksize && (ksize % 2) == 1) {
-                cv::GaussianBlur(roi_img, roi_img, cv::Size(ksize, ksize), sigma, sigma);
-            } else {
-                // TODO:
-            }
+        if (roi_size.height() < 0) {
+            roi_size.setHeight(-roi_size.height());
+            roi_p.setY(roi_p.y() - roi_size.height());
         }
+        // Ensure that the ROI is inside the image
+        if (roi_p.x() < 0 || roi_p.x() >= img.cols)
+            roi_p.setX(0);
+        if (roi_p.y() < 0 || roi_p.y() >= img.rows)
+            roi_p.setY(0);
+        if (roi_p.x() + roi_size.width() > img.cols)
+            roi_size.setWidth(img.cols - roi_p.x());
+        if (roi_p.y() + roi_size.height() > img.rows)
+            roi_size.setHeight(img.rows - roi_p.y());
 
-        if (settings_->useBox()) {
-            const auto ksize = settings_->boxKSize();
-            if (3 <= ksize && (ksize % 2) == 1) {
-                cv::blur(roi_img, roi_img, cv::Size(ksize, ksize));
-            } else {
-                // TODO:
+        if (roi_size.width() > 0 && roi_size.height() > 0) {
+            cv::Mat roi_img = img(cv::Rect(roi_p.x(),
+                                           roi_p.y(),
+                                           roi_size.width(),
+                                           roi_size.height()));
+
+            // Apply required low-pass filters
+            if (settings_->useMedian()) {
+                const auto ksize = settings_->medianKSize();
+                if (3 <= ksize && (ksize % 2) == 1) {
+                    cv::medianBlur(roi_img, roi_img, ksize);
+                } else {
+                    // TODO:
+                }
             }
-        }
 
-        //cv::calcHist()...
-
-        if (settings_->useThreshold()) {
-            const auto thresh = settings_->thresholdValue();
-            if (0 <= thresh && thresh < 255) { // TODO: TEST
-                cv::threshold(roi_img, roi_img, thresh, 255, cv::THRESH_BINARY);
-            } else {
-                // TODO:
+            if (settings_->useGaussian()) {
+                const auto ksize = settings_->gaussianKSize();
+                const auto sigma = settings_->gaussianSigma();
+                if (3 <= ksize && (ksize % 2) == 1) {
+                    cv::GaussianBlur(roi_img, roi_img, cv::Size(ksize, ksize), sigma, sigma);
+                } else {
+                    // TODO:
+                }
             }
-        }
+
+            if (settings_->useBox()) {
+                const auto ksize = settings_->boxKSize();
+                if (3 <= ksize && (ksize % 2) == 1) {
+                    cv::blur(roi_img, roi_img, cv::Size(ksize, ksize));
+                } else {
+                    // TODO:
+                }
+            }
+
+            //cv::calcHist()...
+
+            if (settings_->useThreshold()) {
+                const auto thresh = settings_->thresholdValue();
+                if (0 <= thresh && thresh < 255) { // TODO: TEST
+                    cv::threshold(roi_img, roi_img, thresh, 255, cv::THRESH_BINARY);
+                } else {
+                    // TODO:
+                }
+            }
 
         // find edges
         // find color left->right or right->left
+
+        }
 
         // draw overlay
         //6. draw overlay: rect for regions, current detection, histogram with threshold
