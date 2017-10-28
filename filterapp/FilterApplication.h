@@ -7,11 +7,12 @@
 
 #include <memory>
 
-class QSettings;
 class QTimer;
 
 namespace sfv2 {
   
+    class FilterSettings;
+
     class FilterInput;
     class FilterOutput;
 
@@ -45,7 +46,9 @@ namespace sfv2 {
         FilterApplication(int& argc, char** argv);
         ~FilterApplication();
 
-        void setSettingsFile(const QString& settings_file);
+        FilterSettings& settings();
+
+        void setSettingsFile(const QString& file_name);
 
         void setMainWindow(MainWindow* main_window);
 
@@ -60,7 +63,7 @@ namespace sfv2 {
         bool tryWriteOutput(const FilterOutputData& data);
         void processFrame(const FilterInputData& input_data, FilterOutputData& output_data);
 
-        std::unique_ptr<QSettings> settings_;
+        std::unique_ptr<FilterSettings> settings_;
         std::unique_ptr<QTimer> idle_timer_;
 
         std::unique_ptr<FilterInput> input_;

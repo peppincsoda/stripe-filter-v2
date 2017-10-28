@@ -23,7 +23,7 @@ namespace sfv2 {
         SerialOutput(SerialOutput&&) = default;
         SerialOutput& operator=(SerialOutput&&) = default;
 
-        bool open(const QSettings& settings) override;
+        bool open(const FilterSettings& settings) override;
         bool write(const FilterOutputData& data) override;
 
     private:

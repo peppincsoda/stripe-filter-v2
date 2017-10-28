@@ -1,5 +1,6 @@
 #include "CVInput.h"
-#include <QSettings>
+#include "FilterSettings.h"
+
 #include <QDebug>
 
 #include <opencv2/opencv.hpp>
@@ -16,7 +17,7 @@ namespace sfv2 {
 
     }
 
-    bool CVInput::open(const QSettings& /*settings*/)
+    bool CVInput::open(const FilterSettings& /*settings*/)
     {
         vid_cap_ = std::make_unique<cv::VideoCapture>(0);
         if (!vid_cap_->isOpened()) {

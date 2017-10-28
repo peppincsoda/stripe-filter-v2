@@ -1,5 +1,6 @@
 #include "BaslerInput.h"
-#include <QSettings>
+#include "FilterSettings.h"
+
 #include <QDebug>
 
 #include <opencv2/opencv.hpp>
@@ -9,7 +10,7 @@ namespace sfv2 {
     class BaslerInput::Impl
     {
     public:
-        bool open(const QSettings& settings);
+        bool open(const FilterSettings& settings);
         bool read(FilterInputData& data);
     };
 
@@ -24,7 +25,7 @@ namespace sfv2 {
 
     }
 
-    bool BaslerInput::open(const QSettings& settings)
+    bool BaslerInput::open(const FilterSettings& settings)
     {
         return pimpl_->open(settings);
     }
@@ -34,7 +35,7 @@ namespace sfv2 {
         return pimpl_->read(data);
     }
 
-    bool BaslerInput::Impl::open(const QSettings& /*settings*/)
+    bool BaslerInput::Impl::open(const FilterSettings& /*settings*/)
     {
         return false;
     }

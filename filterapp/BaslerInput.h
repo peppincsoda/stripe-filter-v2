@@ -19,7 +19,7 @@ namespace sfv2 {
         BaslerInput(BaslerInput&&) = default;
         BaslerInput& operator=(BaslerInput&&) = default;
 
-        bool open(const QSettings& settings) override;
+        bool open(const FilterSettings& settings) override;
         bool read(FilterInputData& data) override;
 
     private:

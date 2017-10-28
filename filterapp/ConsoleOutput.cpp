@@ -28,7 +28,7 @@ namespace sfv2 {
 
     }
 
-    bool ConsoleOutput::open(const QSettings& /*settings*/)
+    bool ConsoleOutput::open(const FilterSettings& /*settings*/)
     {
         return true;
     }

@@ -3,21 +3,32 @@
 
 #include <QMainWindow>
 
-class QLabel;
+class QPushButton;
 
 namespace sfv2 {
+
+    class FilterSettings;
+    class FilterApplication;
+    class ImageView;
 
     class MainWindow : public QMainWindow
     {
         Q_OBJECT
     public:
-        explicit MainWindow(QWidget* parent = nullptr);
+        explicit MainWindow(FilterApplication* app, QWidget* parent = nullptr);
         ~MainWindow();
 
-        void setImage(const QImage& qimg);
+        void showImage(QImage&& qimg);
+
+    private Q_SLOTS:
+        void onRoiChanged(const QPoint& top_left, const QSize& size);
 
     private:
-        QLabel* image_lbl_;
+        void addFilterParamsDockWidget();
+
+        FilterApplication* app_;
+        ImageView* image_view_;
+        QPushButton* select_roi_btn_;
     };
 
 }

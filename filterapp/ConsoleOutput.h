@@ -11,7 +11,7 @@ namespace sfv2 {
         ConsoleOutput();
         ~ConsoleOutput();
 
-        bool open(const QSettings& settings) override;
+        bool open(const FilterSettings& settings) override;
         bool write(const FilterOutputData& data) override;
     };
 

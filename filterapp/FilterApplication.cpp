@@ -46,11 +46,16 @@ namespace sfv2 {
 
     }
 
-    void FilterApplication::setSettingsFile(const QString& settings_file)
+    FilterSettings& FilterApplication::settings()
     {
-        qInfo() << "Settings file is:" << settings_file;
+        return *settings_;
+    }
+
+    void FilterApplication::setSettingsFile(const QString& file_name)
+    {
+        qInfo() << "Settings file is:" << file_name;
         // TODO: check if settings file exist
-        settings_ = std::make_unique<QSettings>(settings_file, QSettings::IniFormat);
+        settings_ = std::make_unique<FilterSettings>(file_name);
     }
 
     void FilterApplication::setMainWindow(MainWindow* main_window)
@@ -96,10 +101,7 @@ namespace sfv2 {
     {
         assert(input_ == nullptr);
 
-        const auto input_type = getSettingsEnumValue<InputType>(*settings_,
-                                                                "filterapp/input-type",
-                                                                "CVInput");
-        switch (input_type) {
+        switch (enumValueFromString<InputType>(settings_->inputType())) {
         case InputType::CVInput:
             input_ = std::make_unique<CVInput>();
             break;
@@ -126,10 +128,7 @@ namespace sfv2 {
     {
         assert(output_ == nullptr);
 
-        const auto output_type = getSettingsEnumValue<OutputType>(*settings_,
-                                                                  "filterapp/output-type",
-                                                                  "ConsoleOutput");
-        switch (output_type) {
+        switch (enumValueFromString<OutputType>(settings_->outputType())) {
         case OutputType::ConsoleOutput:
             output_ = std::make_unique<ConsoleOutput>();
             break;
@@ -187,11 +186,72 @@ namespace sfv2 {
     void FilterApplication::processFrame(const FilterInputData& input_data, FilterOutputData& /*output_data*/)
     {
         cv::Mat img;
+
+        // Convert to grayscale
         cv::cvtColor(*input_data.frame, img, cv::COLOR_BGR2GRAY);
 
+        // Select ROI
+        const auto roi_p = settings_->roiTopLeft();
+        const auto roi_size = settings_->roiSize();
+        // TODO: check ROI
+        cv::Mat roi_img = img(cv::Rect(roi_p.x(),
+                                       roi_p.y(),
+                                       roi_size.width(),
+                                       roi_size.height()));
+
+        // Apply required low-pass filters
+        if (settings_->useMedian()) {
+            const auto ksize = settings_->medianKSize();
+            if (3 <= ksize && (ksize % 2) == 1) {
+                cv::medianBlur(roi_img, roi_img, ksize);
+            } else {
+                // TODO:
+            }
+        }
+
+        if (settings_->useGaussian()) {
+            const auto ksize = settings_->gaussianKSize();
+            const auto sigma = settings_->gaussianSigma();
+            if (3 <= ksize && (ksize % 2) == 1) {
+                cv::GaussianBlur(roi_img, roi_img, cv::Size(ksize, ksize), sigma, sigma);
+            } else {
+                // TODO:
+            }
+        }
+
+        if (settings_->useBox()) {
+            const auto ksize = settings_->boxKSize();
+            if (3 <= ksize && (ksize % 2) == 1) {
+                cv::blur(roi_img, roi_img, cv::Size(ksize, ksize));
+            } else {
+                // TODO:
+            }
+        }
+
+        //cv::calcHist()...
+
+        if (settings_->useThreshold()) {
+            const auto thresh = settings_->thresholdValue();
+            if (0 <= thresh && thresh < 255) { // TODO: TEST
+                cv::threshold(roi_img, roi_img, thresh, 255, cv::THRESH_BINARY);
+            } else {
+                // TODO:
+            }
+        }
+
+        // find edges
+        // find color left->right or right->left
+
+        // draw overlay
+        //6. draw overlay: rect for regions, current detection, histogram with threshold
+        //cv::line(img, cv::Point(100, 100), cv::Point(200, 100), 255);
+
         if (main_window_ != nullptr) {
-            QImage qimg(img.data, img.cols, img.rows, img.step, QImage::Format_Grayscale8);
-            main_window_->setImage(qimg);
+            main_window_->showImage(QImage(img.data,
+                                           img.cols,
+                                           img.rows,
+                                           img.step,
+                                           QImage::Format_Grayscale8));
         }
     }
 

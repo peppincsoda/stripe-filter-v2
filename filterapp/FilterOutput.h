@@ -1,9 +1,9 @@
 #ifndef FILTEROUTPUT_H
 #define FILTEROUTPUT_H
 
-class QSettings;
-
 namespace sfv2 {
+
+    class FilterSettings;
 
     enum class FilterStatus
     {
@@ -23,7 +23,7 @@ namespace sfv2 {
     public:
         FilterOutput() {}
         virtual ~FilterOutput() {}
-        virtual bool open(const QSettings& settings) = 0;
+        virtual bool open(const FilterSettings& settings) = 0;
         virtual bool write(const FilterOutputData& data) = 0;
     };
 

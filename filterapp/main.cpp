@@ -44,9 +44,8 @@ int main(int argc, char* argv[])
 
     app.setSettingsFile(parser.value(settingsFileOption));
 
-    sfv2::MainWindow window;
+    sfv2::MainWindow window(&app);
     if (parser.isSet(guiOption)) {
-        app.setMainWindow(&window);
         window.show();
     }
 

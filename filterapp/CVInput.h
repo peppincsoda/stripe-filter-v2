@@ -23,7 +23,7 @@ namespace sfv2 {
         CVInput(CVInput&&) = default;
         CVInput& operator=(CVInput&&) = default;
 
-        bool open(const QSettings& settings) override;
+        bool open(const FilterSettings& settings) override;
         bool read(FilterInputData& data) override;
 
     private:
