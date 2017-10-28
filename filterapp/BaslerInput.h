@@ -3,6 +3,8 @@
 
 #include "FilterInput.h"
 
+#include <memory>
+
 namespace sfv2 {
 
     class BaslerInput : public FilterInput
@@ -11,8 +13,18 @@ namespace sfv2 {
         BaslerInput();
         ~BaslerInput();
 
+        BaslerInput(const BaslerInput&) = delete;
+        BaslerInput& operator=(const BaslerInput&) = delete;
+
+        BaslerInput(BaslerInput&&) = default;
+        BaslerInput& operator=(BaslerInput&&) = default;
+
         bool open(const QSettings& settings) override;
         bool read(FilterInputData& data) override;
+
+    private:
+        class Impl;
+        std::unique_ptr<Impl> pimpl_;
     };
 
 }
