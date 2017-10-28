@@ -18,6 +18,8 @@ namespace sfv2 {
     struct FilterInputData;
     struct FilterOutputData;
 
+    class MainWindow;
+
     class FilterApplication : public QApplication
     {
         Q_OBJECT
@@ -45,6 +47,8 @@ namespace sfv2 {
 
         void setSettingsFile(const QString& settings_file);
 
+        void setMainWindow(MainWindow* main_window);
+
     private Q_SLOTS:
         void onIdle();
 
@@ -64,6 +68,8 @@ namespace sfv2 {
 
         RetryHandler input_handler_;
         RetryHandler output_handler_;
+
+        MainWindow* main_window_;
     };
 
 }

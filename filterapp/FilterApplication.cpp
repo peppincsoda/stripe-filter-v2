@@ -1,5 +1,6 @@
 #include "FilterApplication.h"
 #include "FilterSettings.h"
+#include "MainWindow.h"
 
 #include "CVInput.h"
 #include "BaslerInput.h"
@@ -10,6 +11,7 @@
 #include <QTimer>
 #include <QElapsedTimer>
 #include <QDebug>
+#include <QImage>
 
 #include <opencv2/opencv.hpp>
 
@@ -31,6 +33,7 @@ namespace sfv2 {
         , output_()
         , input_handler_(3, 1000, 30000, [this]() { return openInput(); })
         , output_handler_(3, 1000, 30000, [this]() { return openOutput(); })
+        , main_window_(nullptr)
     {
         idle_timer_ = std::make_unique<QTimer>();
         connect(idle_timer_.get(), SIGNAL(timeout()), this, SLOT(onIdle()));
@@ -50,10 +53,14 @@ namespace sfv2 {
         settings_ = std::make_unique<QSettings>(settings_file, QSettings::IniFormat);
     }
 
+    void FilterApplication::setMainWindow(MainWindow* main_window)
+    {
+        main_window_ = main_window;
+    }
+
     void FilterApplication::onIdle()
     {
         if (exit_requested_) {
-            qInfo() << "Exiting...";
             quit();
             return;
         }
@@ -63,6 +70,7 @@ namespace sfv2 {
 
         doFrame();
 
+        // Never process the next frame before min_period_ms_ has been elapsed
         idle_timer_->start(std::max(min_period_ms_ - static_cast<int>(timer.elapsed()), 0));
     }
 
@@ -103,6 +111,9 @@ namespace sfv2 {
             break;
         }
 
+        if (input_ == nullptr)
+            return false;
+
         if (!input_->open(*settings_)) {
             input_ = nullptr;
             return false;
@@ -130,6 +141,9 @@ namespace sfv2 {
             break;
         }
 
+        if (output_ == nullptr)
+            return false;
+
         if (!output_->open(*settings_)) {
             output_ = nullptr;
             return false;
@@ -145,6 +159,7 @@ namespace sfv2 {
         }
 
         if (!input_->read(data)) {
+            qWarning() << "Resetting input";
             input_ = nullptr;
             input_handler_.reset();
             return false;
@@ -160,6 +175,7 @@ namespace sfv2 {
         }
 
         if (!output_->write(data)) {
+            qWarning() << "Resetting output";
             output_ = nullptr;
             output_handler_.reset();
             return false;
@@ -170,11 +186,13 @@ namespace sfv2 {
 
     void FilterApplication::processFrame(const FilterInputData& input_data, FilterOutputData& /*output_data*/)
     {
-        cv::Mat edges;
-        cv::cvtColor(*input_data.frame, edges, cv::COLOR_BGR2GRAY);
-        cv::GaussianBlur(edges, edges, cv::Size(7,7), 1.5, 1.5);
-        cv::Canny(edges, edges, 0, 30, 3);
-        cv::imshow("edges", edges);
+        cv::Mat img;
+        cv::cvtColor(*input_data.frame, img, cv::COLOR_BGR2GRAY);
+
+        if (main_window_ != nullptr) {
+            QImage qimg(img.data, img.cols, img.rows, img.step, QImage::Format_Grayscale8);
+            main_window_->setImage(qimg);
+        }
     }
 
 

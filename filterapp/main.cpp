@@ -1,4 +1,5 @@
 #include "FilterApplication.h"
+#include "MainWindow.h"
 
 #include <QCommandLineParser>
 #include <QDebug>
@@ -29,15 +30,27 @@ int main(int argc, char* argv[])
     parser.addHelpOption();
     parser.addVersionOption();
 
+    QCommandLineOption guiOption(QStringList() << "g" << "gui",
+        QCoreApplication::translate("main", "Show GUI."));
+    parser.addOption(guiOption);
+
     QCommandLineOption settingsFileOption(QStringList() << "s" << "settings-file",
-                QCoreApplication::translate("main", "Reads all settings from <file-path>."),
-                QCoreApplication::translate("main", "file-path"),
-                "settings.ini");
+        QCoreApplication::translate("main", "Reads all settings from <file-path>."),
+        QCoreApplication::translate("main", "file-path"),
+        "settings.ini");
     parser.addOption(settingsFileOption);
 
     parser.process(app);
 
     app.setSettingsFile(parser.value(settingsFileOption));
 
-    return app.exec();
+    sfv2::MainWindow window;
+    if (parser.isSet(guiOption)) {
+        app.setMainWindow(&window);
+        window.show();
+    }
+
+    const auto ret = app.exec();
+    qInfo() << "Exiting...";
+    return ret;
 }
