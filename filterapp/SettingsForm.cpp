@@ -3,6 +3,8 @@
 #include "FilterSettings.h"
 
 #include <QMetaEnum>
+#include <QPixmap>
+#include <QPainter>
 
 namespace sfv2 {
 
@@ -48,6 +50,7 @@ namespace sfv2 {
         void onBoxKSizeChanged();
         void onUseThresholdChanged();
         void onThresholdValueChanged();
+        void onBlackObjectChanged();
         void onPortNameChanged();
         void onBaudRateChanged();
         void onDataBitsChanged();
@@ -74,6 +77,25 @@ namespace sfv2 {
     SettingsForm::~SettingsForm()
     {
 
+    }
+
+    int SettingsForm::histDisplayHeight() const
+    {
+        return pimpl_->ui->histogramLabel->height();
+    }
+
+    void SettingsForm::setHistImage(QImage&& qimg)
+    {
+        auto pixmap = QPixmap::fromImage(std::move(qimg));
+
+        QPainter p(&pixmap);
+        p.setPen(Qt::white);
+
+        const auto x = pimpl_->settings_->thresholdValue();
+        p.drawLine(x, 0, x, pixmap.height());
+        p.end();
+
+        pimpl_->ui->histogramLabel->setPixmap(std::move(pixmap));
     }
 
     SettingsForm::Impl::Impl(FilterSettings* settings, QWidget *parent)
@@ -136,6 +158,10 @@ namespace sfv2 {
         ui->thresholdValueSlider->setValue(settings_->thresholdValue());
         connect(ui->thresholdValueSlider, SIGNAL(valueChanged(int)),
                 this, SLOT(onThresholdValueChanged()));
+
+        ui->blackObjectCheckBox->setChecked(settings_->blackObject());
+        connect(ui->blackObjectCheckBox, SIGNAL(toggled(bool)),
+                this, SLOT(onBlackObjectChanged()));
 
         // Serial port
         ui->portNameLineEdit->setText(settings_->serialPortName());
@@ -235,6 +261,11 @@ namespace sfv2 {
     void SettingsForm::Impl::onThresholdValueChanged()
     {
         settings_->setThresholdValue(ui->thresholdValueSlider->value());
+    }
+
+    void SettingsForm::Impl::onBlackObjectChanged()
+    {
+        settings_->setBlackObject(ui->blackObjectCheckBox->isChecked());
     }
 
     void SettingsForm::Impl::onPortNameChanged()

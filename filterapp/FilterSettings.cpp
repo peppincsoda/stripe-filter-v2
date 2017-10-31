@@ -174,6 +174,16 @@ namespace sfv2 {
         pimpl_->s_.setValue("filter/threshold-value", value);
     }
 
+    bool FilterSettings::blackObject() const
+    {
+        return pimpl_->s_.value("filter/black-object", true).toBool();
+    }
+
+    void FilterSettings::setBlackObject(bool black_object)
+    {
+        pimpl_->s_.setValue("filter/black-object", black_object);
+    }
+
     QString FilterSettings::serialPortName() const
     {
         return pimpl_->s_.value("serial/port-name", "ttyUSB0").toString();
@@ -187,7 +197,7 @@ namespace sfv2 {
     QSerialPort::BaudRate FilterSettings::serialBaudRate() const
     {
         return enumValueFromString<QSerialPort::BaudRate>(
-                    pimpl_->s_.value("serial/port-name", "Baud38400").toString());
+                    pimpl_->s_.value("serial/port-name", "Baud19200").toString());
     }
 
     void FilterSettings::setSerialBaudRate(QSerialPort::BaudRate baud_rate)

@@ -17,6 +17,7 @@ namespace sfv2 {
         , app_(app)
         , image_view_(nullptr)
         , select_roi_btn_(nullptr)
+        , settings_form_(nullptr)
     {
         if (app != nullptr) {
             app->setMainWindow(this);
@@ -39,12 +40,19 @@ namespace sfv2 {
         connect(select_roi_btn_, SIGNAL(toggled(bool)),
                 image_view_, SLOT(setSelectRoi(bool)));
 
+        settings_form_ = new SettingsForm(&app_->settings(), this);
+
         addFilterParamsDockWidget();
     }
 
     MainWindow::~MainWindow()
     {
 
+    }
+
+    int MainWindow::histDisplayHeight() const
+    {
+        return settings_form_->histDisplayHeight();
     }
 
     void MainWindow::showImage(QImage&& qimg)
@@ -60,6 +68,11 @@ namespace sfv2 {
         image_view_->updateImage(std::move(pixmap));
     }
 
+    void MainWindow::showHistImage(QImage&& qimg)
+    {
+        settings_form_->setHistImage(std::move(qimg));
+    }
+
     void MainWindow::onRoiChanged(const QPoint& top_left, const QSize& size)
     {
         app_->settings().setRoiTopLeft(top_left);
@@ -71,12 +84,10 @@ namespace sfv2 {
     {
         auto* dock_widget = new QDockWidget(QString(), this);
 
-        auto* dock_contents = new SettingsForm(&app_->settings(), this);
-
         dock_widget->setObjectName("filterParamsDockWidget");
         dock_widget->setWindowTitle(tr("Filter Parameters"));
         dock_widget->setFeatures(QDockWidget::NoDockWidgetFeatures);
-        dock_widget->setWidget(dock_contents);
+        dock_widget->setWidget(settings_form_);
         addDockWidget(Qt::RightDockWidgetArea, dock_widget);
     }
 }

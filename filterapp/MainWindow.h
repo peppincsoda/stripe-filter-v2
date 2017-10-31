@@ -7,9 +7,9 @@ class QPushButton;
 
 namespace sfv2 {
 
-    class FilterSettings;
     class FilterApplication;
     class ImageView;
+    class SettingsForm;
 
     class MainWindow : public QMainWindow
     {
@@ -18,7 +18,10 @@ namespace sfv2 {
         explicit MainWindow(FilterApplication* app, QWidget* parent = nullptr);
         ~MainWindow();
 
+        int histDisplayHeight() const;
+
         void showImage(QImage&& qimg);
+        void showHistImage(QImage&& qimg);
 
     private Q_SLOTS:
         void onRoiChanged(const QPoint& top_left, const QSize& size);
@@ -29,6 +32,7 @@ namespace sfv2 {
         FilterApplication* app_;
         ImageView* image_view_;
         QPushButton* select_roi_btn_;
+        SettingsForm* settings_form_;
     };
 
 }

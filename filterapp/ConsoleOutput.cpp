@@ -35,7 +35,10 @@ namespace sfv2 {
 
     bool ConsoleOutput::write(const FilterOutputData& data)
     {
-        std::cout << std::setw(5) << std::left << data.measurement
+        std::cout << "                                        \r";
+        std::cout << std::setw(5) << std::left << data.left_dist
+                  << std::setw(5) << std::left << data.right_dist
+                  << std::setw(5) << std::left << data.measurement
                   << " " << getFilterStatusStr(data.status) << '\r';
         return true;
     }

@@ -14,6 +14,8 @@ namespace sfv2 {
 
     struct FilterOutputData
     {
+        int left_dist;
+        int right_dist;
         int measurement;
         FilterStatus status;
     };

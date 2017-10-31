@@ -23,6 +23,7 @@ namespace sfv2 {
         Q_PROPERTY(int BoxKSize READ boxKSize WRITE setBoxKSize)
         Q_PROPERTY(bool UseThreshold READ useThreshold WRITE setUseThreshold)
         Q_PROPERTY(int ThresholdValue READ thresholdValue WRITE setThresholdValue)
+        Q_PROPERTY(bool BlackObject READ blackObject WRITE setBlackObject)
         Q_PROPERTY(QString SerialPortName READ serialPortName WRITE setSerialPortName)
         Q_PROPERTY(QSerialPort::BaudRate SerialBaudRate READ serialBaudRate WRITE setSerialBaudRate)
         Q_PROPERTY(QSerialPort::DataBits SerialDataBits READ serialDataBits WRITE setSerialDataBits)
@@ -94,6 +95,9 @@ namespace sfv2 {
 
         int thresholdValue() const;
         void setThresholdValue(int value);
+
+        bool blackObject() const;
+        void setBlackObject(bool black_object);
 
         QString serialPortName() const;
         void setSerialPortName(const QString& name);

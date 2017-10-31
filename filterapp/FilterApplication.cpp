@@ -90,6 +90,8 @@ namespace sfv2 {
         if (tryReadInput(input_data)) {
             processFrame(input_data, output_data);
         } else {
+            output_data.left_dist = 0;
+            output_data.right_dist = 0;
             output_data.measurement = 0;
             output_data.status = FilterStatus::InputFailed;
         }
@@ -183,9 +185,12 @@ namespace sfv2 {
         return true;
     }
 
-    void FilterApplication::processFrame(const FilterInputData& input_data, FilterOutputData& /*output_data*/)
+    void FilterApplication::processFrame(const FilterInputData& input_data, FilterOutputData& output_data)
     {
+        // Intensity image
         cv::Mat img;
+        // Rendered histogram
+        cv::Mat hist_img;
 
         // Convert to grayscale
         cv::cvtColor(*input_data.frame, img, cv::COLOR_BGR2GRAY);
@@ -220,47 +225,117 @@ namespace sfv2 {
 
             // Apply required low-pass filters
             if (settings_->useMedian()) {
-                const auto ksize = settings_->medianKSize();
-                if (3 <= ksize && (ksize % 2) == 1) {
-                    cv::medianBlur(roi_img, roi_img, ksize);
-                } else {
-                    // TODO:
+                auto ksize = settings_->medianKSize();
+                if (!(3 <= ksize && (ksize % 2) == 1)) {
+                    ksize = 3;
+                    settings_->setMedianKSize(ksize);
+                    qWarning() << "Invalid setting for filter/median-ksize; value reverted to default";
                 }
+                cv::medianBlur(roi_img, roi_img, ksize);
             }
 
             if (settings_->useGaussian()) {
-                const auto ksize = settings_->gaussianKSize();
-                const auto sigma = settings_->gaussianSigma();
-                if (3 <= ksize && (ksize % 2) == 1) {
-                    cv::GaussianBlur(roi_img, roi_img, cv::Size(ksize, ksize), sigma, sigma);
-                } else {
-                    // TODO:
+                auto ksize = settings_->gaussianKSize();
+                auto sigma = settings_->gaussianSigma();
+                if (!(3 <= ksize && (ksize % 2) == 1)) {
+                    ksize = 3;
+                    settings_->setGaussianKSize(ksize);
+                    qWarning() << "Invalid setting for filter/gaussian-ksize; value reverted to default";
                 }
+                if (!(0.1 <= sigma)) {
+                    sigma = 1.5;
+                    settings_->setGaussianSigma(sigma);
+                    qWarning() << "Invalid setting for filter/gaussian-sigma; value reverted to default";
+                }
+                cv::GaussianBlur(roi_img, roi_img, cv::Size(ksize, ksize), sigma, sigma);
             }
 
             if (settings_->useBox()) {
-                const auto ksize = settings_->boxKSize();
-                if (3 <= ksize && (ksize % 2) == 1) {
-                    cv::blur(roi_img, roi_img, cv::Size(ksize, ksize));
-                } else {
-                    // TODO:
+                auto ksize = settings_->boxKSize();
+                if (!(3 <= ksize && (ksize % 2) == 1)) {
+                    ksize = 3;
+                    settings_->setBoxKSize(ksize);
+                    qWarning() << "Invalid setting for filter/box-ksize; value reverted to default";
                 }
+                cv::blur(roi_img, roi_img, cv::Size(ksize, ksize));
             }
 
-            //cv::calcHist()...
+            // Compute histogram if running with UI
+            if (main_window_ != nullptr)
+            {
+                int channels[] = { 0 };
+                int num_bins[] = { 256 };
+                float sranges[] = { 0, 256 };
+                const float* ranges[] = { sranges };
+                cv::Mat hist;
+
+                cv::calcHist(&roi_img, 1, channels, cv::Mat(), // do not use mask
+                             hist, 1, num_bins, ranges,
+                             true, // the histogram is uniform
+                             false // clear the result matrix before calculation
+                             );
+
+                const auto hist_height = main_window_->histDisplayHeight();
+                cv::normalize(hist, hist, hist_height);
+                //double max_val = 0;
+                //cv::minMaxLoc(hist, 0, &max_val, 0, 0);
+
+                hist_img = cv::Mat::zeros(hist_height, num_bins[0], CV_8UC1);
+                for (int i = 0; i < num_bins[0]; i++) {
+                    const auto bin_val = hist.at<float>(i);
+                    const auto intensity = cvRound(bin_val);
+                    //const auto intensity = cvRound(bin_val * hist_height / max_val);
+
+                    cv::line(hist_img, cv::Point(i, hist_height - intensity), cv::Point(i, hist_height), 255);
+                }
+            }
 
             if (settings_->useThreshold()) {
-                const auto thresh = settings_->thresholdValue();
-                if (0 <= thresh && thresh < 255) { // TODO: TEST
-                    cv::threshold(roi_img, roi_img, thresh, 255, cv::THRESH_BINARY);
-                } else {
-                    // TODO:
+                auto thresh = settings_->thresholdValue();
+                if (!(0 <= thresh && thresh < 255)) {
+                    thresh = 127;
+                    settings_->setThresholdValue(thresh);
+                    qWarning() << "Invalid setting for filter/threshold-value; value reverted to default";
+
                 }
+                cv::threshold(roi_img, roi_img, thresh, 255, cv::THRESH_BINARY);
             }
 
-        // find edges
-        // find color left->right or right->left
+            // TODO: we should process only around the centerline of the ROI
+            // Find the object on the horizontal centerline of the ROI
+            {
+                const auto intensity = settings_->blackObject() ? 0 : 255;
 
+                const int half_rows = roi_img.rows / 2;
+                // Find intensity from left
+                int col_left = 0;
+                while (col_left < roi_img.cols &&
+                       roi_img.at<uchar>(half_rows, col_left) != intensity) {
+                    col_left++;
+                }
+
+                // Find intensity from right
+                int col_right = roi_img.cols - 1;
+                while (col_right >= 0 &&
+                       roi_img.at<uchar>(half_rows, col_right) != intensity) {
+                    col_right--;
+                }
+
+                output_data.left_dist = col_left;
+                output_data.right_dist = col_right;
+
+                if (col_left >= roi_img.cols ||
+                    col_right < 0 ||
+                    col_left > col_right) {
+
+                    output_data.measurement = 0;
+                    output_data.status = FilterStatus::ProcessingFailed;
+                } else {
+                    output_data.measurement = col_right - col_left + 1;
+                    output_data.status = FilterStatus::OK;
+                }
+
+            }
         }
 
         // draw overlay
@@ -273,8 +348,12 @@ namespace sfv2 {
                                            img.rows,
                                            img.step,
                                            QImage::Format_Grayscale8));
+            main_window_->showHistImage(QImage(hist_img.data,
+                                               hist_img.cols,
+                                               hist_img.rows,
+                                               hist_img.step,
+                                               QImage::Format_Grayscale8));
         }
     }
-
 
 }

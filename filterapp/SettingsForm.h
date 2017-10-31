@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+class QImage;
+
 namespace sfv2 {
 
     class FilterSettings;
@@ -14,6 +16,9 @@ namespace sfv2 {
     public:
         explicit SettingsForm(FilterSettings* settings, QWidget *parent = nullptr);
         ~SettingsForm();
+
+        int histDisplayHeight() const;
+        void setHistImage(QImage&& qimg);
 
     private:
         class Impl;
