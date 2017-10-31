@@ -101,14 +101,14 @@ namespace sfv2 {
     {
         assert(input_ == nullptr);
 
-        switch (enumValueFromString<InputType>(settings_->inputType())) {
-        case InputType::CVInput:
+        switch (settings_->inputType()) {
+        case FilterSettings::CVInput:
             input_ = std::make_unique<CVInput>();
             break;
-        case InputType::BaslerInput:
+        case FilterSettings::BaslerInput:
             input_ = std::make_unique<BaslerInput>();
             break;
-        case InputType::UnknownInput:
+        case FilterSettings::UnknownInput:
             qWarning() << "Unknown input type in settings";
             break;
         }
@@ -128,14 +128,14 @@ namespace sfv2 {
     {
         assert(output_ == nullptr);
 
-        switch (enumValueFromString<OutputType>(settings_->outputType())) {
-        case OutputType::ConsoleOutput:
+        switch (settings_->outputType()) {
+        case FilterSettings::ConsoleOutput:
             output_ = std::make_unique<ConsoleOutput>();
             break;
-        case OutputType::SerialOutput:
+        case FilterSettings::SerialOutput:
             output_ = std::make_unique<SerialOutput>();
             break;
-        case OutputType::UnknownOutput:
+        case FilterSettings::UnknownOutput:
             qWarning() << "Unknown output type in settings";
             break;
         }

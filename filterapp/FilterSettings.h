@@ -1,29 +1,54 @@
 #ifndef FILTERSETTINGS_H
 #define FILTERSETTINGS_H
 
-#include <QMetaEnum>
+#include <QSerialPort>
 
 #include <memory>
 
 namespace sfv2 {
 
-    template<class _T>
-    _T enumValueFromString(const QString& str)
+    class FilterSettings : public QObject
     {
-        return static_cast<_T>(
-            QMetaEnum::fromType<_T>().keyToValue(str.toUtf8()));
-    }
-
-    template<class _T>
-    QString enumValueToString(_T value)
-    {
-        return QMetaEnum::fromType<_T>().valueToKey(static_cast<int>(value));
-    }
-
-    class FilterSettings
-    {
+        Q_OBJECT
+        Q_PROPERTY(InputType InputType READ inputType WRITE setInputType)
+        Q_PROPERTY(OutputType OutputType READ outputType WRITE setOutputType)
+        Q_PROPERTY(QPoint RoiTopLeft READ roiTopLeft)
+        Q_PROPERTY(QSize RoiSize READ roiSize)
+        Q_PROPERTY(bool UseMedian READ useMedian WRITE setUseMedian)
+        Q_PROPERTY(int MedianKSize READ medianKSize WRITE setMedianKSize)
+        Q_PROPERTY(bool UseGaussian READ useGaussian WRITE setUseGaussian)
+        Q_PROPERTY(int GaussianKSize READ gaussianKSize WRITE setGaussianKSize)
+        Q_PROPERTY(double GaussianSigma READ gaussianSigma WRITE setGaussianSigma)
+        Q_PROPERTY(bool UseBox READ useBox WRITE setUseBox)
+        Q_PROPERTY(int BoxKSize READ boxKSize WRITE setBoxKSize)
+        Q_PROPERTY(bool UseThreshold READ useThreshold WRITE setUseThreshold)
+        Q_PROPERTY(int ThresholdValue READ thresholdValue WRITE setThresholdValue)
+        Q_PROPERTY(QString SerialPortName READ serialPortName WRITE setSerialPortName)
+        Q_PROPERTY(QSerialPort::BaudRate SerialBaudRate READ serialBaudRate WRITE setSerialBaudRate)
+        Q_PROPERTY(QSerialPort::DataBits SerialDataBits READ serialDataBits WRITE setSerialDataBits)
+        Q_PROPERTY(QSerialPort::Parity SerialParity READ serialParity WRITE setSerialParity)
+        Q_PROPERTY(QSerialPort::StopBits SerialStopBits READ serialStopBits WRITE setSerialStopBits)
+        Q_PROPERTY(QSerialPort::FlowControl SerialFlowControl READ serialFlowControl WRITE setSerialFlowControl)
+        Q_PROPERTY(int ModbusSlaveAddress READ modbusSlaveAddress WRITE setModbusSlaveAddress)
+        Q_PROPERTY(int ModbusDataAddress READ modbusDataAddress WRITE setModbusDataAddress)
     public:
-        explicit FilterSettings(const QString& file_name);
+        enum InputType
+        {
+            CVInput,
+            BaslerInput,
+            UnknownInput = -1,
+        };
+        Q_ENUM(InputType)
+
+        enum OutputType
+        {
+            ConsoleOutput,
+            SerialOutput,
+            UnknownOutput = -1,
+        };
+        Q_ENUM(OutputType)
+
+        explicit FilterSettings(const QString& file_name, QObject* parent = nullptr);
         ~FilterSettings();
 
         FilterSettings(const FilterSettings&) = delete;
@@ -32,8 +57,11 @@ namespace sfv2 {
         FilterSettings(FilterSettings&&) = default;
         FilterSettings& operator=(FilterSettings&&) = default;
 
-        QString inputType() const;
-        QString outputType() const;
+        InputType inputType() const;
+        void setInputType(InputType input_type);
+
+        OutputType outputType() const;
+        void setOutputType(OutputType output_type);
 
         QPoint roiTopLeft() const;
         QSize roiSize() const;
@@ -41,27 +69,55 @@ namespace sfv2 {
         void setRoiSize(const QSize& size);
 
         bool useMedian() const;
+        void setUseMedian(bool use_median);
+
         int medianKSize() const;
+        void setMedianKSize(int k_size);
 
         bool useGaussian() const;
+        void setUseGaussian(bool use_gaussian);
+
         int gaussianKSize() const;
+        void setGaussianKSize(int k_size);
+
         double gaussianSigma() const;
+        void setGaussianSigma(double sigma);
 
         bool useBox() const;
+        void setUseBox(bool use_box);
+
         int boxKSize() const;
+        void setBoxKSize(int k_size);
 
         bool useThreshold() const;
+        void setUseThreshold(bool use_threshold);
+
         int thresholdValue() const;
+        void setThresholdValue(int value);
 
         QString serialPortName() const;
-        int serialBaudRate() const;
-        int serialDataBits() const;
-        QString serialParity() const;
-        int serialStopBits() const;
-        QString serialFlowControl() const;
+        void setSerialPortName(const QString& name);
+
+        QSerialPort::BaudRate serialBaudRate() const;
+        void setSerialBaudRate(QSerialPort::BaudRate baud_rate);
+
+        QSerialPort::DataBits serialDataBits() const;
+        void setSerialDataBits(QSerialPort::DataBits data_bits);
+
+        QSerialPort::Parity serialParity() const;
+        void setSerialParity(QSerialPort::Parity parity);
+
+        QSerialPort::StopBits serialStopBits() const;
+        void setSerialStopBits(QSerialPort::StopBits stop_bits);
+
+        QSerialPort::FlowControl serialFlowControl() const;
+        void setSerialFlowControl(QSerialPort::FlowControl flow_control);
 
         int modbusSlaveAddress() const;
+        void setModbusSlaveAddress(int address);
+
         int modbusDataAddress() const;
+        void setModbusDataAddress(int address);
 
     private:
         class Impl;

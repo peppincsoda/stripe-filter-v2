@@ -25,22 +25,6 @@ namespace sfv2 {
     {
         Q_OBJECT
     public:
-        enum class InputType
-        {
-            CVInput,
-            BaslerInput,
-            UnknownInput = -1,
-        };
-        Q_ENUM(InputType)
-
-        enum class OutputType
-        {
-            ConsoleOutput,
-            SerialOutput,
-            UnknownOutput = -1,
-        };
-        Q_ENUM(OutputType)
-
         static void requestExit();
 
         FilterApplication(int& argc, char** argv);

@@ -2,13 +2,12 @@
 #include "ImageView.h"
 #include "FilterApplication.h"
 #include "FilterSettings.h"
+#include "SettingsForm.h"
 
 #include <QDesktopWidget>
-#include <QLabel>
 #include <QPainter>
 
 #include <QDockWidget>
-#include <QGridLayout>
 #include <QPushButton>
 
 namespace sfv2 {
@@ -72,11 +71,7 @@ namespace sfv2 {
     {
         auto* dock_widget = new QDockWidget(QString(), this);
 
-        auto* layout = new QGridLayout;
-        layout->addWidget(select_roi_btn_, 0, 0);
-
-        auto* dock_contents = new QWidget(dock_widget);
-        dock_contents->setLayout(layout);
+        auto* dock_contents = new SettingsForm(&app_->settings(), this);
 
         dock_widget->setObjectName("filterParamsDockWidget");
         dock_widget->setWindowTitle(tr("Filter Parameters"));

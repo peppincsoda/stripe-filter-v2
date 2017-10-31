@@ -31,19 +31,19 @@ namespace sfv2 {
             qWarning() << "Invalid baud rate setting for serial port";
             return false;
         }
-        if (!sp_->setDataBits(static_cast<QSerialPort::DataBits>(settings.serialDataBits()))) {
+        if (!sp_->setDataBits(settings.serialDataBits())) {
             qWarning() << "Invalid data bits setting for serial port";
             return false;
         }
-        if (!sp_->setParity(enumValueFromString<QSerialPort::Parity>(settings.serialParity()))) {
+        if (!sp_->setParity(settings.serialParity())) {
             qWarning() << "Invalid parity setting for serial port";
             return false;
         }
-        if (!sp_->setStopBits(static_cast<QSerialPort::StopBits>(settings.serialStopBits()))) {
+        if (!sp_->setStopBits(settings.serialStopBits())) {
             qWarning() << "Invalid stop bits setting for serial port";
             return false;
         }
-        if (!sp_->setFlowControl(enumValueFromString<QSerialPort::FlowControl>(settings.serialFlowControl()))) {
+        if (!sp_->setFlowControl(settings.serialFlowControl())) {
             qWarning() << "Invalid flow control setting for serial port";
             return false;
         }
