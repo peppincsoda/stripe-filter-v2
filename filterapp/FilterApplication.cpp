@@ -12,6 +12,7 @@
 #include <QElapsedTimer>
 #include <QDebug>
 #include <QImage>
+#include <QFileInfo>
 
 #include <opencv2/opencv.hpp>
 
@@ -53,8 +54,13 @@ namespace sfv2 {
 
     void FilterApplication::setSettingsFile(const QString& file_name)
     {
-        qInfo() << "Settings file is:" << file_name;
-        // TODO: check if settings file exist
+        QFileInfo info(file_name);
+        if (!info.exists() || !info.isFile()) {
+            qWarning() << "Settings file" << file_name << "was not found; using default parameters";
+        } else {
+            qInfo() << "Settings file is:" << file_name;
+        }
+
         settings_ = std::make_unique<FilterSettings>(file_name);
     }
 
