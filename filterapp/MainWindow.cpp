@@ -1,49 +1,44 @@
 #include "MainWindow.h"
+#include "ui_MainWindow.h"
 #include "ImageView.h"
 #include "FilterApplication.h"
 #include "FilterSettings.h"
 #include "SettingsForm.h"
 #include "FilterOutput.h"
 
-#include <QDesktopWidget>
 #include <QPainter>
 
-#include <QDockWidget>
-#include <QPushButton>
+#include <cassert>
 
 namespace sfv2 {
 
     MainWindow::MainWindow(FilterApplication* app, QWidget* parent)
         : QMainWindow(parent)
+        , ui(new Ui::MainWindow)
         , app_(app)
-        , image_view_(nullptr)
-        , select_roi_btn_(nullptr)
         , settings_form_(nullptr)
     {
-        if (app != nullptr) {
-            app->setMainWindow(this);
-        }
+        assert(app != nullptr);
 
-        setObjectName("mainWindow");
-        setWindowTitle(tr("stripe-filter-v2"));
-        resize(QDesktopWidget().availableGeometry().size() * 0.7);
+        ui->setupUi(this);
 
-        image_view_ = new ImageView(this);
-        image_view_->setRoi(app_->settings().roiTopLeft(),
-                            app_->settings().roiSize());
-        setCentralWidget(image_view_);
+        app->setMainWindow(this);
 
-        connect(image_view_, SIGNAL(roiChanged(QPoint,QSize)),
+        ui->imageView->setRoi(app_->settings().roiTopLeft(),
+                              app_->settings().roiSize());
+        connect(ui->imageView, SIGNAL(roiChanged(QPoint,QSize)),
                 this, SLOT(onRoiChanged(QPoint,QSize)));
 
-        select_roi_btn_ = new QPushButton(tr("Select ROI"), this);
-        select_roi_btn_->setCheckable(true);
-        connect(select_roi_btn_, SIGNAL(toggled(bool)),
-                image_view_, SLOT(setSelectRoi(bool)));
+        connect(ui->actionSelectRoi, SIGNAL(toggled(bool)),
+                ui->imageView, SLOT(setSelectRoi(bool)));
+        connect(ui->actionExit, SIGNAL(triggered(bool)),
+                this, SLOT(close()));
 
-        settings_form_ = new SettingsForm(&app_->settings(), this);
+        settings_form_ = new SettingsForm(&app_->settings(), this, Qt::Tool);
+        settings_form_->show();
 
-        addFilterParamsDockWidget();
+        connect(ui->actionShowSettings, SIGNAL(triggered(bool)),
+                settings_form_, SLOT(show()));
     }
 
     MainWindow::~MainWindow()
@@ -60,6 +55,8 @@ namespace sfv2 {
     {
         auto pixmap = QPixmap::fromImage(std::move(qimg));
 
+        resize(pixmap.width(), pixmap.height());
+
         // Draw detection lines
         const auto& roi_p = app_->settings().roiTopLeft();
         const auto& roi_size = app_->settings().roiSize();
@@ -75,7 +72,7 @@ namespace sfv2 {
 
         p.end();
 
-        image_view_->updateImage(std::move(pixmap));
+        ui->imageView->updateImage(std::move(pixmap));
     }
 
     void MainWindow::setHistImage(QImage&& qimg)
@@ -87,17 +84,11 @@ namespace sfv2 {
     {
         app_->settings().setRoiTopLeft(top_left);
         app_->settings().setRoiSize(size);
-        select_roi_btn_->setChecked(false);
+        ui->actionSelectRoi->setChecked(false);
     }
 
-    void MainWindow::addFilterParamsDockWidget()
+    void MainWindow::onShowSettings()
     {
-        auto* dock_widget = new QDockWidget(QString(), this);
-
-        dock_widget->setObjectName("filterParamsDockWidget");
-        dock_widget->setWindowTitle(tr("Filter Parameters"));
-        dock_widget->setFeatures(QDockWidget::NoDockWidgetFeatures);
-        dock_widget->setWidget(settings_form_);
-        addDockWidget(Qt::RightDockWidgetArea, dock_widget);
+        settings_form_->show();
     }
 }

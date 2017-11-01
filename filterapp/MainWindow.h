@@ -3,12 +3,15 @@
 
 #include <QMainWindow>
 
-class QPushButton;
+namespace Ui {
+    class MainWindow;
+}
+
+class QImage;
 
 namespace sfv2 {
 
     class FilterApplication;
-    class ImageView;
     class SettingsForm;
     struct FilterOutputData;
 
@@ -26,13 +29,11 @@ namespace sfv2 {
 
     private Q_SLOTS:
         void onRoiChanged(const QPoint& top_left, const QSize& size);
+        void onShowSettings();
 
     private:
-        void addFilterParamsDockWidget();
-
+        Ui::MainWindow *ui;
         FilterApplication* app_;
-        ImageView* image_view_;
-        QPushButton* select_roi_btn_;
         SettingsForm* settings_form_;
     };
 

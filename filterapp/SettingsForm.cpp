@@ -6,6 +6,8 @@
 #include <QPixmap>
 #include <QPainter>
 
+#include <cassert>
+
 namespace sfv2 {
 
     template<class _T>
@@ -68,8 +70,8 @@ namespace sfv2 {
 
 
 
-    SettingsForm::SettingsForm(FilterSettings* settings, QWidget *parent)
-        : QWidget(parent)
+    SettingsForm::SettingsForm(FilterSettings* settings, QWidget *parent, Qt::WindowFlags flags)
+        : QWidget(parent, flags)
         , pimpl_(new Impl(settings, this))
     {
 
@@ -104,6 +106,8 @@ namespace sfv2 {
         , ui(new Ui::SettingsForm)
         , settings_(settings)
     {
+        assert(settings != nullptr);
+
         ui->setupUi(this);
 
         // Input/Output
