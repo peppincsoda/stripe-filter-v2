@@ -14,6 +14,7 @@ namespace sfv2 {
         Q_PROPERTY(OutputType OutputType READ outputType WRITE setOutputType)
         Q_PROPERTY(QPoint RoiTopLeft READ roiTopLeft)
         Q_PROPERTY(QSize RoiSize READ roiSize)
+        Q_PROPERTY(bool OptimizeRoi READ optimizeRoi WRITE setOptimizeRoi)
         Q_PROPERTY(bool UseMedian READ useMedian WRITE setUseMedian)
         Q_PROPERTY(int MedianKSize READ medianKSize WRITE setMedianKSize)
         Q_PROPERTY(bool UseGaussian READ useGaussian WRITE setUseGaussian)
@@ -68,6 +69,9 @@ namespace sfv2 {
         QSize roiSize() const;
         void setRoiTopLeft(const QPoint& point);
         void setRoiSize(const QSize& size);
+
+        bool optimizeRoi() const;
+        void setOptimizeRoi(bool optimize_roi);
 
         bool useMedian() const;
         void setUseMedian(bool use_median);

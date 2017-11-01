@@ -9,6 +9,7 @@ namespace sfv2 {
     {
         OK,
         ProcessingFailed,
+        ProcessingInvalidParams,
         InputFailed,
     };
 

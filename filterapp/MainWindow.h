@@ -10,6 +10,7 @@ namespace sfv2 {
     class FilterApplication;
     class ImageView;
     class SettingsForm;
+    struct FilterOutputData;
 
     class MainWindow : public QMainWindow
     {
@@ -20,8 +21,8 @@ namespace sfv2 {
 
         int histDisplayHeight() const;
 
-        void showImage(QImage&& qimg);
-        void showHistImage(QImage&& qimg);
+        void setImageAndOutput(QImage&& qimg, const FilterOutputData &output_data);
+        void setHistImage(QImage&& qimg);
 
     private Q_SLOTS:
         void onRoiChanged(const QPoint& top_left, const QSize& size);

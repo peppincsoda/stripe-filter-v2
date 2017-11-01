@@ -3,6 +3,7 @@
 #include "FilterApplication.h"
 #include "FilterSettings.h"
 #include "SettingsForm.h"
+#include "FilterOutput.h"
 
 #include <QDesktopWidget>
 #include <QPainter>
@@ -55,20 +56,29 @@ namespace sfv2 {
         return settings_form_->histDisplayHeight();
     }
 
-    void MainWindow::showImage(QImage&& qimg)
+    void MainWindow::setImageAndOutput(QImage&& qimg, const FilterOutputData &output_data)
     {
         auto pixmap = QPixmap::fromImage(std::move(qimg));
 
-        QPainter p(&pixmap);
-        p.setPen(Qt::white);
+        // Draw detection lines
+        const auto& roi_p = app_->settings().roiTopLeft();
+        const auto& roi_size = app_->settings().roiSize();
 
-        p.drawLine(0, 0, 200, 200);
+        QPainter p(&pixmap);
+
+        p.setPen(Qt::yellow);
+        const auto xleft = roi_p.x() + output_data.left_dist;
+        p.drawLine(xleft, roi_p.y(), xleft, roi_p.y() + roi_size.height());
+        p.setPen(Qt::red);
+        const auto xright = roi_p.x() + output_data.right_dist;
+        p.drawLine(xright, roi_p.y(), xright, roi_p.y() + roi_size.height());
+
         p.end();
 
         image_view_->updateImage(std::move(pixmap));
     }
 
-    void MainWindow::showHistImage(QImage&& qimg)
+    void MainWindow::setHistImage(QImage&& qimg)
     {
         settings_form_->setHistImage(std::move(qimg));
     }

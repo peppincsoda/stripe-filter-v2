@@ -12,6 +12,8 @@ namespace sfv2 {
             return "OK";
         case FilterStatus::ProcessingFailed:
             return "ProcessingFailed";
+        case FilterStatus::ProcessingInvalidParams:
+            return "ProcessingInvalidParams";
         case FilterStatus::InputFailed:
             return "InputFailed";
         }
@@ -35,11 +37,10 @@ namespace sfv2 {
 
     bool ConsoleOutput::write(const FilterOutputData& data)
     {
-        std::cout << "                                        \r";
-        std::cout << std::setw(5) << std::left << data.left_dist
-                  << std::setw(5) << std::left << data.right_dist
-                  << std::setw(5) << std::left << data.measurement
-                  << " " << getFilterStatusStr(data.status) << '\r';
+        std::cout << " L:" << std::setw(5) << std::right << data.left_dist
+                  << " R:" << std::setw(5) << std::right << data.right_dist
+                  << " OUTPUT:" << std::setw(5) << std::right << data.measurement
+                  << " STATUS:" << getFilterStatusStr(data.status) << " | \r";
         return true;
     }
 }

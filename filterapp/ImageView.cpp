@@ -30,7 +30,7 @@ namespace sfv2 {
                    roi_size_.height());
         p.end();
 
-        setPixmap(pixmap);
+        setPixmap(std::move(pixmap));
     }
 
     void ImageView::setRoi(const QPoint& top_left, const QSize& size)

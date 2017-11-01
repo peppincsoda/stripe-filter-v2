@@ -41,6 +41,7 @@ namespace sfv2 {
     private Q_SLOTS:
         void onInputTypeChanged();
         void onOutputTypeChanged();
+        void onOptimizeRoiChanged();
         void onUseMedianChanged();
         void onMedianKSizeChanged();
         void onUseGaussianChanged();
@@ -89,7 +90,7 @@ namespace sfv2 {
         auto pixmap = QPixmap::fromImage(std::move(qimg));
 
         QPainter p(&pixmap);
-        p.setPen(Qt::white);
+        p.setPen(Qt::yellow);
 
         const auto x = pimpl_->settings_->thresholdValue();
         p.drawLine(x, 0, x, pixmap.height());
@@ -115,6 +116,10 @@ namespace sfv2 {
         setCurrentIndexFromData(ui->outputTypeComboBox, settings_->outputType());
         connect(ui->outputTypeComboBox, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(onOutputTypeChanged()));
+
+        ui->optimizeRoiCheckBox->setChecked(settings_->optimizeRoi());
+        connect(ui->optimizeRoiCheckBox, SIGNAL(toggled(bool)),
+                this, SLOT(onOptimizeRoiChanged()));
 
         // Median
         ui->useMedianCheckBox->setChecked(settings_->useMedian());
@@ -216,6 +221,11 @@ namespace sfv2 {
     void SettingsForm::Impl::onOutputTypeChanged()
     {
         settings_->setOutputType(static_cast<FilterSettings::OutputType>(ui->outputTypeComboBox->currentData().toInt()));
+    }
+
+    void SettingsForm::Impl::onOptimizeRoiChanged()
+    {
+        settings_->setOptimizeRoi(ui->optimizeRoiCheckBox->isChecked());
     }
 
     void SettingsForm::Impl::onUseMedianChanged()

@@ -84,6 +84,16 @@ namespace sfv2 {
         pimpl_->s_.setValue("filter/roi-size", size);
     }
 
+    bool FilterSettings::optimizeRoi() const
+    {
+        return pimpl_->s_.value("filter/optimize-roi", true).toBool();
+    }
+
+    void FilterSettings::setOptimizeRoi(bool optimize_roi)
+    {
+        pimpl_->s_.setValue("filter/optimize-roi", optimize_roi);
+    }
+
     bool FilterSettings::useMedian() const
     {
         return pimpl_->s_.value("filter/use-median", false).toBool();
