@@ -50,7 +50,10 @@ namespace sfv2 {
 
     void FilterSettings::setInputType(FilterSettings::InputType input_type)
     {
-        pimpl_->s_.setValue("filterapp/input-type", enumValueToString(input_type));
+        if (inputType() != input_type) {
+            pimpl_->s_.setValue("filterapp/input-type", enumValueToString(input_type));
+            emit inputTypeChanged();
+        }
     }
 
     FilterSettings::OutputType FilterSettings::outputType() const
@@ -61,7 +64,10 @@ namespace sfv2 {
 
     void FilterSettings::setOutputType(FilterSettings::OutputType output_type)
     {
-        pimpl_->s_.setValue("filterapp/output-type", enumValueToString(output_type));
+        if (outputType() != output_type) {
+            pimpl_->s_.setValue("filterapp/output-type", enumValueToString(output_type));
+            emit outputTypeChanged();
+        }
     }
 
     QPoint FilterSettings::roiTopLeft() const
@@ -201,7 +207,10 @@ namespace sfv2 {
 
     void FilterSettings::setSerialPortName(const QString &name)
     {
-        pimpl_->s_.setValue("serial/port-name", name);
+        if (serialPortName() != name) {
+            pimpl_->s_.setValue("serial/port-name", name);
+            emit serialPortChanged();
+        }
     }
 
     QSerialPort::BaudRate FilterSettings::serialBaudRate() const
@@ -212,7 +221,10 @@ namespace sfv2 {
 
     void FilterSettings::setSerialBaudRate(QSerialPort::BaudRate baud_rate)
     {
-        pimpl_->s_.setValue("serial/port-name", enumValueToString(baud_rate));
+        if (serialBaudRate() != baud_rate) {
+            pimpl_->s_.setValue("serial/port-name", enumValueToString(baud_rate));
+            emit serialPortChanged();
+        }
     }
 
     QSerialPort::DataBits FilterSettings::serialDataBits() const
@@ -223,7 +235,10 @@ namespace sfv2 {
 
     void FilterSettings::setSerialDataBits(QSerialPort::DataBits data_bits)
     {
-        pimpl_->s_.setValue("serial/databits", enumValueToString(data_bits));
+        if (serialDataBits() != data_bits) {
+            pimpl_->s_.setValue("serial/databits", enumValueToString(data_bits));
+            emit serialPortChanged();
+        }
     }
 
     QSerialPort::Parity FilterSettings::serialParity() const
@@ -234,7 +249,10 @@ namespace sfv2 {
 
     void FilterSettings::setSerialParity(QSerialPort::Parity parity)
     {
-        pimpl_->s_.setValue("serial/parity", enumValueToString(parity));
+        if (serialParity() != parity) {
+            pimpl_->s_.setValue("serial/parity", enumValueToString(parity));
+            emit serialPortChanged();
+        }
     }
 
     QSerialPort::StopBits FilterSettings::serialStopBits() const
@@ -245,7 +263,10 @@ namespace sfv2 {
 
     void FilterSettings::setSerialStopBits(QSerialPort::StopBits stop_bits)
     {
-        pimpl_->s_.setValue("serial/stopbits", enumValueToString(stop_bits));
+        if (serialStopBits() != stop_bits) {
+            pimpl_->s_.setValue("serial/stopbits", enumValueToString(stop_bits));
+            emit serialPortChanged();
+        }
     }
 
     QSerialPort::FlowControl FilterSettings::serialFlowControl() const
@@ -256,7 +277,10 @@ namespace sfv2 {
 
     void FilterSettings::setSerialFlowControl(QSerialPort::FlowControl flow_control)
     {
-        pimpl_->s_.setValue("serial/flow-control", enumValueToString(flow_control));
+        if (serialFlowControl() != flow_control) {
+            pimpl_->s_.setValue("serial/flow-control", enumValueToString(flow_control));
+            emit serialPortChanged();
+        }
     }
 
     int FilterSettings::modbusSlaveAddress() const
@@ -266,7 +290,10 @@ namespace sfv2 {
 
     void FilterSettings::setModbusSlaveAddress(int address)
     {
-        pimpl_->s_.setValue("modbus/slave-address", address);
+        if (modbusSlaveAddress() != address) {
+            pimpl_->s_.setValue("modbus/slave-address", address);
+            emit serialPortChanged();
+        }
     }
 
     int FilterSettings::modbusDataAddress() const
@@ -276,7 +303,10 @@ namespace sfv2 {
 
     void FilterSettings::setModbusDataAddress(int address)
     {
-        pimpl_->s_.setValue("modbus/data-address", address);
+        if (modbusDataAddress() != address) {
+            pimpl_->s_.setValue("modbus/data-address", address);
+            emit serialPortChanged();
+        }
     }
 
     FilterSettings::Impl::Impl(const QString& file_name)

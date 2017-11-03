@@ -42,6 +42,9 @@ namespace sfv2 {
 
     private Q_SLOTS:
         void onIdle();
+        void resetInput();
+        void resetOutput();
+        void onSerialPortChanged();
 
     private:
         void doFrame();

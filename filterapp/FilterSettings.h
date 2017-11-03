@@ -10,8 +10,8 @@ namespace sfv2 {
     class FilterSettings : public QObject
     {
         Q_OBJECT
-        Q_PROPERTY(InputType InputType READ inputType WRITE setInputType)
-        Q_PROPERTY(OutputType OutputType READ outputType WRITE setOutputType)
+        Q_PROPERTY(InputType InputType READ inputType WRITE setInputType NOTIFY inputTypeChanged)
+        Q_PROPERTY(OutputType OutputType READ outputType WRITE setOutputType NOTIFY outputTypeChanged)
         Q_PROPERTY(QPoint RoiTopLeft READ roiTopLeft)
         Q_PROPERTY(QSize RoiSize READ roiSize)
         Q_PROPERTY(bool OptimizeRoi READ optimizeRoi WRITE setOptimizeRoi)
@@ -126,6 +126,11 @@ namespace sfv2 {
 
         int modbusDataAddress() const;
         void setModbusDataAddress(int address);
+
+    Q_SIGNALS:
+        void inputTypeChanged();
+        void outputTypeChanged();
+        void serialPortChanged();
 
     private:
         class Impl;

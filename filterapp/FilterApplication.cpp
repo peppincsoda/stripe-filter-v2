@@ -62,6 +62,12 @@ namespace sfv2 {
         }
 
         settings_ = std::make_unique<FilterSettings>(file_name);
+        connect(settings_.get(), SIGNAL(inputTypeChanged()),
+                this, SLOT(resetInput()));
+        connect(settings_.get(), SIGNAL(outputTypeChanged()),
+                this, SLOT(resetOutput()));
+        connect(settings_.get(), SIGNAL(serialPortChanged()),
+                this, SLOT(onSerialPortChanged()));
     }
 
     void FilterApplication::setMainWindow(MainWindow* main_window)
@@ -103,6 +109,27 @@ namespace sfv2 {
         }
 
         tryWriteOutput(output_data);
+    }
+
+    void FilterApplication::resetInput()
+    {
+        qWarning() << "Resetting input";
+        input_ = nullptr;
+        input_handler_.reset();
+    }
+
+    void FilterApplication::resetOutput()
+    {
+        qWarning() << "Resetting output";
+        output_ = nullptr;
+        output_handler_.reset();
+    }
+
+    void FilterApplication::onSerialPortChanged()
+    {
+        if (settings_->outputType() == FilterSettings::SerialOutput) {
+            resetOutput();
+        }
     }
 
     bool FilterApplication::openInput()
@@ -166,9 +193,7 @@ namespace sfv2 {
         }
 
         if (!input_->read(data)) {
-            qWarning() << "Resetting input";
-            input_ = nullptr;
-            input_handler_.reset();
+            resetInput();
             return false;
         }
 
@@ -182,9 +207,7 @@ namespace sfv2 {
         }
 
         if (!output_->write(data)) {
-            qWarning() << "Resetting output";
-            output_ = nullptr;
-            output_handler_.reset();
+            resetOutput();
             return false;
         }
 
