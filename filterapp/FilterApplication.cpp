@@ -63,9 +63,9 @@ namespace sfv2 {
 
         settings_ = std::make_unique<FilterSettings>(file_name);
         connect(settings_.get(), SIGNAL(inputTypeChanged()),
-                this, SLOT(resetInput()));
+                this, SLOT(closeInput()));
         connect(settings_.get(), SIGNAL(outputTypeChanged()),
-                this, SLOT(resetOutput()));
+                this, SLOT(closeOutput()));
         connect(settings_.get(), SIGNAL(serialPortChanged()),
                 this, SLOT(onSerialPortChanged()));
     }
@@ -111,16 +111,16 @@ namespace sfv2 {
         tryWriteOutput(output_data);
     }
 
-    void FilterApplication::resetInput()
+    void FilterApplication::closeInput()
     {
-        qWarning() << "Resetting input";
+        qInfo() << "Closing input";
         input_ = nullptr;
         input_handler_.reset();
     }
 
-    void FilterApplication::resetOutput()
+    void FilterApplication::closeOutput()
     {
-        qWarning() << "Resetting output";
+        qInfo() << "Closing output";
         output_ = nullptr;
         output_handler_.reset();
     }
@@ -128,7 +128,7 @@ namespace sfv2 {
     void FilterApplication::onSerialPortChanged()
     {
         if (settings_->outputType() == FilterSettings::SerialOutput) {
-            resetOutput();
+            closeOutput();
         }
     }
 
@@ -138,9 +138,11 @@ namespace sfv2 {
 
         switch (settings_->inputType()) {
         case FilterSettings::CVInput:
+            qInfo() << "Opening OpenCV input";
             input_ = std::make_unique<CVInput>();
             break;
         case FilterSettings::BaslerInput:
+            qInfo() << "Opening Basler camera input";
             input_ = std::make_unique<BaslerInput>();
             break;
         case FilterSettings::UnknownInput:
@@ -165,9 +167,11 @@ namespace sfv2 {
 
         switch (settings_->outputType()) {
         case FilterSettings::ConsoleOutput:
+            qInfo() << "Opening console output";
             output_ = std::make_unique<ConsoleOutput>();
             break;
         case FilterSettings::SerialOutput:
+            qInfo() << "Opening serial output";
             output_ = std::make_unique<SerialOutput>();
             break;
         case FilterSettings::UnknownOutput:
@@ -193,7 +197,7 @@ namespace sfv2 {
         }
 
         if (!input_->read(data)) {
-            resetInput();
+            closeInput();
             return false;
         }
 
@@ -207,7 +211,7 @@ namespace sfv2 {
         }
 
         if (!output_->write(data)) {
-            resetOutput();
+            closeOutput();
             return false;
         }
 
