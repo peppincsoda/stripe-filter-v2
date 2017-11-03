@@ -216,13 +216,13 @@ namespace sfv2 {
     QSerialPort::BaudRate FilterSettings::serialBaudRate() const
     {
         return enumValueFromString<QSerialPort::BaudRate>(
-                    pimpl_->s_.value("serial/port-name", "Baud19200").toString());
+                    pimpl_->s_.value("serial/baud-rate", "Baud19200").toString());
     }
 
     void FilterSettings::setSerialBaudRate(QSerialPort::BaudRate baud_rate)
     {
         if (serialBaudRate() != baud_rate) {
-            pimpl_->s_.setValue("serial/port-name", enumValueToString(baud_rate));
+            pimpl_->s_.setValue("serial/baud-rate", enumValueToString(baud_rate));
             emit serialPortChanged();
         }
     }
