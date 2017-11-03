@@ -20,6 +20,12 @@ namespace sfv2 {
     {
         assert(app != nullptr);
 
+        {
+            auto window_flags = windowFlags();
+            window_flags.setFlag(Qt::WindowMaximizeButtonHint, false);
+            setWindowFlags(window_flags);
+        }
+
         ui->setupUi(this);
 
         app->setMainWindow(this);
