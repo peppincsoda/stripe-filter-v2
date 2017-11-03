@@ -3,8 +3,33 @@
 
 #include <QCommandLineParser>
 #include <QDebug>
+#include <QDateTime>
 
+#include <iostream>
 #include <signal.h>
+
+static void message_handler(QtMsgType type, const QMessageLogContext &/*context*/, const QString &msg)
+{
+    const auto& date_time = QDateTime::currentDateTimeUtc().toString(Qt::ISODate).toLocal8Bit();
+    const auto& local_msg = msg.toLocal8Bit();
+    switch (type) {
+    case QtDebugMsg:
+        std::cerr << date_time.constData() << " DEBUG    " << local_msg.constData() << std::endl;
+        break;
+    case QtInfoMsg:
+        std::cerr << date_time.constData() << " INFO     " << local_msg.constData() << std::endl;
+        break;
+    case QtWarningMsg:
+        std::cerr << date_time.constData() << " WARNING  " << local_msg.constData() << std::endl;
+        break;
+    case QtCriticalMsg:
+        std::cerr << date_time.constData() << " CRITICAL " << local_msg.constData() << std::endl;
+        break;
+    case QtFatalMsg:
+        std::cerr << date_time.constData() << " FATAL    " << local_msg.constData() << std::endl;
+        break;
+    }
+}
 
 static void sig_handler(int signo)
 {
@@ -16,9 +41,11 @@ static void sig_handler(int signo)
 
 int main(int argc, char* argv[])
 {
+    qInstallMessageHandler(message_handler);
+
     if (signal(SIGINT, sig_handler) == SIG_ERR ||
         signal(SIGTERM, sig_handler) == SIG_ERR) {
-        qCritical() << "Cannot install SIGINT handler";
+        qFatal("Cannot install SIGINT handler");
         return -1;
     }
 
