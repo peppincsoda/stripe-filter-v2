@@ -3,7 +3,7 @@
 
 #include "RetryHandler.h"
 
-#include <QApplication>
+#include <QObject>
 
 #include <memory>
 
@@ -25,13 +25,13 @@ namespace sfv2 {
 
     class MainWindow;
 
-    class FilterApplication : public QApplication
+    class FilterApplication : public QObject
     {
         Q_OBJECT
     public:
         static void requestExit();
 
-        FilterApplication(int& argc, char** argv);
+        explicit FilterApplication(QObject* parent = nullptr);
         ~FilterApplication();
 
         FilterSettings& settings();
@@ -39,6 +39,9 @@ namespace sfv2 {
         void setSettingsFile(const QString& file_name);
 
         void setMainWindow(MainWindow* main_window);
+
+    Q_SIGNALS:
+        void quit();
 
     private Q_SLOTS:
         void onIdle();

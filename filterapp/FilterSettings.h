@@ -1,6 +1,8 @@
 #ifndef FILTERSETTINGS_H
 #define FILTERSETTINGS_H
 
+#include <QPoint>
+#include <QSize>
 #include <QSerialPort>
 
 #include <memory>

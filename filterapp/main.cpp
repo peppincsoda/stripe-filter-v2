@@ -1,6 +1,7 @@
 #include "FilterApplication.h"
 #include "MainWindow.h"
 
+#include <QApplication>
 #include <QCommandLineParser>
 #include <QDebug>
 #include <QDateTime>
@@ -40,6 +41,16 @@ static void sig_handler(int signo)
     }
 }
 
+static std::unique_ptr<QCoreApplication> create_application(int& argc, char** argv)
+{
+    for (int i = 1; i < argc; ++i) {
+        if (qstrcmp(argv[i], "-g") == 0 || qstrcmp(argv[i], "--gui") == 0) {
+            return std::make_unique<QApplication>(argc, argv);
+        }
+    }
+    return std::make_unique<QCoreApplication>(argc, argv);
+}
+
 int main(int argc, char* argv[])
 {
     qInstallMessageHandler(message_handler);
@@ -50,14 +61,15 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    sfv2::FilterApplication app(argc, argv);
-    QCoreApplication::setApplicationName("stripe-filter");
-    QCoreApplication::setApplicationVersion("2.0");
+    auto app = create_application(argc, argv);
+    app->setApplicationName("stripe-filter");
+    app->setApplicationVersion("2.0");
 
     QCommandLineParser parser;
     parser.addHelpOption();
     parser.addVersionOption();
 
+    // This is needed only for displaying the help
     QCommandLineOption guiOption(QStringList() << "g" << "gui",
         QCoreApplication::translate("main", "Show GUI."));
     parser.addOption(guiOption);
@@ -68,17 +80,24 @@ int main(int argc, char* argv[])
         "settings.ini");
     parser.addOption(settingsFileOption);
 
-    parser.process(app);
+    parser.process(*app);
 
-    app.setSettingsFile(parser.value(settingsFileOption));
+    sfv2::FilterApplication filter_app;
+    QObject::connect(&filter_app, SIGNAL(quit()),
+                     app.get(), SLOT(quit()));
+
+    filter_app.setSettingsFile(parser.value(settingsFileOption));
 
     std::unique_ptr<sfv2::MainWindow> window;
-    if (parser.isSet(guiOption)) {
-        window = std::make_unique<sfv2::MainWindow>(&app);
+    if (qobject_cast<QApplication *>(app.get()) != nullptr) {
+        // Show UI
+        window = std::make_unique<sfv2::MainWindow>(&filter_app);
         window->show();
+    } else {
+        qInfo() << "Running in headless mode";
     }
 
-    const auto ret = app.exec();
+    const auto ret = app->exec();
     qInfo() << "Exiting...";
     return ret;
 }

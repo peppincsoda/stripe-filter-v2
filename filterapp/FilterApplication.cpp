@@ -26,8 +26,8 @@ namespace sfv2 {
         exit_requested_ = true;
     }
 
-    FilterApplication::FilterApplication(int& argc, char** argv)
-        : QApplication(argc, argv)
+    FilterApplication::FilterApplication(QObject* parent)
+        : QObject(parent)
         , settings_()
         , idle_timer_()
         , input_()
@@ -78,7 +78,7 @@ namespace sfv2 {
     void FilterApplication::onIdle()
     {
         if (exit_requested_) {
-            quit();
+            emit quit();
             return;
         }
 
@@ -221,6 +221,8 @@ namespace sfv2 {
     void FilterApplication::processFrame(const FilterInputData& input_data, FilterOutputData& output_data)
     {
         cv::Mat* input_img = input_data.frame;
+
+        // TODO: convert colors only if needed
 
         // Convert to grayscale in GUI mode
         cv::Mat gray_img;
