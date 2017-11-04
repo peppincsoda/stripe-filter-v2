@@ -6,6 +6,7 @@
 #include <QDateTime>
 
 #include <iostream>
+#include <memory>
 #include <signal.h>
 
 static void message_handler(QtMsgType type, const QMessageLogContext &/*context*/, const QString &msg)
@@ -71,9 +72,10 @@ int main(int argc, char* argv[])
 
     app.setSettingsFile(parser.value(settingsFileOption));
 
-    sfv2::MainWindow window(&app);
+    std::unique_ptr<sfv2::MainWindow> window;
     if (parser.isSet(guiOption)) {
-        window.show();
+        window = std::make_unique<sfv2::MainWindow>(&app);
+        window->show();
     }
 
     const auto ret = app.exec();
