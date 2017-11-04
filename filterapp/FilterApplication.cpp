@@ -222,11 +222,10 @@ namespace sfv2 {
     {
         cv::Mat* input_img = input_data.frame;
 
-        // TODO: convert colors only if needed
-
-        // Convert to grayscale in GUI mode
+        // Convert the full image to grayscale in GUI mode (if it is not already grayscale)
         cv::Mat gray_img;
-        if (main_window_ != nullptr) {
+        if (main_window_ != nullptr &&
+            input_img->type() != CV_8UC1) {
             cv::cvtColor(*input_img, gray_img, cv::COLOR_BGR2GRAY);
             input_img = &gray_img;
         }
@@ -246,12 +245,15 @@ namespace sfv2 {
                                                     roi_size.height()));
             cv::Mat* proc_img = &roi_img;
 
-            // Convert to grayscale in headless mode
+            // Convert ROI to grayscale in headless mode
             cv::Mat roi_gray_img;
-            if (main_window_ == nullptr) {
+            if (main_window_ == nullptr &&
+                proc_img->type() != CV_8UC1) {
                 cv::cvtColor(roi_img, roi_gray_img, cv::COLOR_BGR2GRAY);
                 proc_img = &roi_gray_img;
             }
+
+            assert(proc_img->type() == CV_8UC1);
 
             applyLowPassFilters(*proc_img);
 

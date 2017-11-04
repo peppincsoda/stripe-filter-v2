@@ -1,0 +1,8 @@
+LIBRARY BaslerLib
+EXPORTS
+	BaslerSetLogger
+
+	BaslerCameraNew
+	BaslerCameraFree
+	BaslerCameraOpen
+	BaslerCameraGrabFrame
