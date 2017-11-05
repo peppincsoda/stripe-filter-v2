@@ -192,6 +192,10 @@ namespace sfv2 {
 
     bool FilterApplication::tryReadInput(FilterInputData& data)
     {
+        if (settings_->inputType() == FilterSettings::UnknownInput) {
+            return false;
+        }
+
         if (!input_handler_.succeeded()) {
             return false;
         }
@@ -206,6 +210,10 @@ namespace sfv2 {
 
     bool FilterApplication::tryWriteOutput(const FilterOutputData &data)
     {
+        if (settings_->outputType() == FilterSettings::UnknownOutput) {
+            return false;
+        }
+
         if (!output_handler_.succeeded()) {
             return false;
         }
