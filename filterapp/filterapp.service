@@ -1,0 +1,13 @@
+[Unit]
+Description=stripe-filter-v2 service
+After=multi-user.target
+ 
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/work
+ExecStart=/home/pi/work/build/bin/filterapp --settings-file=/home/pi/work/settings.ini
+Restart=on-abort
+ 
+[Install]
+WantedBy=multi-user.target
