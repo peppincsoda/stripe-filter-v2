@@ -9,7 +9,7 @@
 
 namespace sfv2 {
 
-    static void _stdcall qtLogger_(basler::LogLevel level,
+    static void STDCALL qtLogger_(basler::LogLevel level,
                                     const char* file,
                                     int line,
                                     const char* func,

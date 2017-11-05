@@ -14,8 +14,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
 #set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
 #set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -pg")
 
-add_subdirectory(filterapp)
 # The basler library (which is directly linked to the Basler SDK libs) is not supported on MINGW32
-if(!MINGW)
+if(NOT MINGW)
     add_subdirectory(basler)
 endif()
+add_subdirectory(filterapp)

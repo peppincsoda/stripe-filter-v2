@@ -24,7 +24,7 @@ target_link_libraries(${PROJECT_NAME}
     ${OpenCV_LIBS}
 )
 
-if(!MINGW)
+if(NOT MINGW)
     target_link_libraries(${PROJECT_NAME}
         basler
     )

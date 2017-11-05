@@ -13,7 +13,11 @@ namespace basler {
         va_start(arg_list, format);
 
         char message[1024];
+#ifdef _WIN32
         vsprintf_s(message, format, arg_list);
+#else !_WIN32
+        vsnprintf(message, sizeof(message), format, arg_list);
+#endif // _WIN32
 
         logger_(level, file, line, func, message);
         va_end(arg_list);
@@ -21,7 +25,7 @@ namespace basler {
 
 }
 
-extern "C" void _stdcall BaslerSetLogger(basler::LoggerFn fn)
+extern "C" void STDCALL BaslerSetLogger(basler::LoggerFn fn)
 {
     basler::logger_ = fn;
 }

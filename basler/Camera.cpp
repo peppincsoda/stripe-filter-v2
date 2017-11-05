@@ -27,7 +27,7 @@ namespace basler {
         CGrabResultPtr grab_result_;
     };
 
-    Camera::Camera(Api* api)
+    Camera::Camera(Api* /*api*/)
         : pimpl_(new CameraImpl)
     {
 
@@ -134,24 +134,24 @@ namespace basler {
 
 }
 
-extern "C" basler::CameraImpl* _stdcall BaslerCameraNew()
+extern "C" basler::CameraImpl* STDCALL BaslerCameraNew()
 {
     return new basler::CameraImpl;
 }
 
-extern "C" void _stdcall BaslerCameraFree(basler::CameraImpl* cam)
+extern "C" void STDCALL BaslerCameraFree(basler::CameraImpl* cam)
 {
     delete cam;
 }
 
-extern "C" basler::Status _stdcall BaslerCameraOpen(basler::CameraImpl* cam)
+extern "C" basler::Status STDCALL BaslerCameraOpen(basler::CameraImpl* cam)
 {
     if (!cam->open())
         return basler::Status::Failed;
     return basler::Status::OK;
 }
 
-extern "C" basler::Status _stdcall BaslerCameraGrabFrame(basler::CameraImpl* cam, basler::GrabFrameResult* result)
+extern "C" basler::Status STDCALL BaslerCameraGrabFrame(basler::CameraImpl* cam, basler::GrabFrameResult* result)
 {
     if (!cam->grabFrame(*result))
         return basler::Status::Failed;
