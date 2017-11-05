@@ -1,14 +1,12 @@
 #include "Camera.h"
 #include "Logger.h"
 
+#include <memory>
+
 #include <pylon/PylonIncludes.h>
 #include <pylon/gige/BaslerGigEInstantCamera.h>
 
 using namespace Pylon;
-
-typedef Pylon::CBaslerGigEInstantCamera Camera_t;
-using namespace Basler_GigECameraParams;
-using namespace Basler_GigEStreamParams;
 
 namespace basler {
 
@@ -23,30 +21,9 @@ namespace basler {
 
     private:
         PylonAutoInitTerm auto_init_term_;
-        Camera_t camera_;
+        std::unique_ptr<CInstantCamera> camera_;
         CGrabResultPtr grab_result_;
     };
-
-    Camera::Camera(Api* /*api*/)
-        : pimpl_(new CameraImpl)
-    {
-
-    }
-
-    Camera::~Camera()
-    {
-        delete pimpl_;
-    }
-
-    bool Camera::open()
-    {
-        return pimpl_->open();
-    }
-
-    bool Camera::grabFrame(GrabFrameResult& result)
-    {
-        return pimpl_->grabFrame(result);
-    }
 
     CameraImpl::CameraImpl()
         : auto_init_term_()
@@ -61,27 +38,37 @@ namespace basler {
 
     bool CameraImpl::open()
     {
+        // Return true if the camera has already been opened
+        if (camera_ != nullptr)
+            return true;
+
         try {
-            if (!camera_.IsPylonDeviceAttached()) {
-                camera_.Attach(CTlFactory::GetInstance().CreateFirstDevice());
+            std::unique_ptr<IPylonDevice> device(CTlFactory::GetInstance().CreateFirstDevice());
+            if (device->GetDeviceInfo().GetDeviceClass() == BaslerGigEDeviceClass) {
+                std::unique_ptr<CBaslerGigEInstantCamera> camera(new CBaslerGigEInstantCamera(device.get()));
+                device.release();
 
-                LOG_INFO("Using device: %s", camera_.GetDeviceInfo().GetModelName().c_str());
+                //camera_->PixelFormat.SetValue(Basler_GigECamera::PixelFormat_Mono8);
+                camera->AcquisitionMode.SetValue(Basler_GigECameraParams::AcquisitionMode_Continuous);
+                camera->GevSCPSPacketSize = 1500;
+                camera->MaxNumBuffer = 2;
 
-                //camera_.PixelFormat.SetValue(Basler_GigECamera::PixelFormat_Mono8);
-                //camera_.TriggerSelector.SetValue(TriggerSelector_AcquisitionStart);
-                //camera_.TriggerMode.SetValue(TriggerMode_Off);
-                //camera_.TriggerSelector.SetValue(TriggerSelector_FrameStart);
-                //camera_.TriggerMode.SetValue(TriggerMode_Off);
+                camera_ = std::move(camera);
 
-                camera_.AcquisitionMode.SetValue(AcquisitionMode_Continuous);
-                camera_.GevSCPSPacketSize = 1500;
-                camera_.MaxNumBuffer = 2;
+            } else {
+                std::unique_ptr<CInstantCamera> camera(new CInstantCamera(device.get()));
+                device.release();
 
-                camera_.StartGrabbing(GrabStrategy_LatestImages);
+                camera_ = std::move(camera);
             }
+
+            LOG_INFO("Using device: %s", camera_->GetDeviceInfo().GetModelName().c_str());
+
+            camera_->StartGrabbing(GrabStrategy_LatestImages);
 
         } catch (GenericException& e) {
             LOG_WARNING("Failed to open camera device: %s", e.GetDescription());
+            camera_ = nullptr;
             return false;
         }
 
@@ -91,7 +78,7 @@ namespace basler {
     bool CameraImpl::grabFrame(GrabFrameResult& result)
     {
         try {
-            if (!camera_.RetrieveResult(1000, grab_result_, TimeoutHandling_Return)) {
+            if (!camera_->RetrieveResult(1000, grab_result_, TimeoutHandling_Return)) {
                 LOG_WARNING("RetrieveResult timed out");
                 return false;
             }
@@ -130,6 +117,29 @@ namespace basler {
         }
 
         return true;
+    }
+
+
+    Camera::Camera(Api* /*api*/)
+        : pimpl_(new CameraImpl)
+    {
+
+    }
+
+    Camera::~Camera()
+    {
+        delete pimpl_;
+        pimpl_ = nullptr;
+    }
+
+    bool Camera::open()
+    {
+        return pimpl_->open();
+    }
+
+    bool Camera::grabFrame(GrabFrameResult& result)
+    {
+        return pimpl_->grabFrame(result);
     }
 
 }
