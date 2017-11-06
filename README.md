@@ -19,11 +19,11 @@ The measurement results can then be sent to a PLC over the serial line using the
 
 The specific scenario for which this application was designed is the following:
 An extrusion machine that applies plastic coating to metal pipes gives varying coating thickness along the pipe and thus
-needs regular checking and tuning manually. We are working to automate this: A PLC can regulate the machine according to
-thickness measurements from a sensor. This sensor is a Raspberry Pi connected to a Basler industrial camera and running
+needs regular manual checking and tuning. We want to automate this with a PLC that can regulate the machine according to
+thickness measurements from an optical sensor. The sensor is a Raspberry Pi connected to a Basler industrial camera and running
 this application.
 
-You can also run the application reading from different kinds of inputs and writing to different
+You can also run the application reading from other kinds of inputs and writing to other
 kinds of outputs. For example, you can use a USB webcam and write the measurement to the console to play with
 the filter parameters.
 
