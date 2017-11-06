@@ -9,6 +9,8 @@ Table of contents
     * [Installing as a service](#installing-as-a-service)
   * [Building on Windows](#building-on-windows)
   * [Usage](#usage)
+  * [Known bugs](#known-bugs)
+  * [License](#license)
 
 ## Introduction
 
@@ -38,7 +40,7 @@ These are the processing steps incorporated into the filter:
 + Binary thresholding
 + Searching the borders of the object inside the ROI
 
-You can turn on/off all filters and the binary thresholding in this pipeline when configuring and tuning.
+You can turn on/off any of the filters and the binary thresholding in this pipeline.
 
 ### Why v2?
 
@@ -71,12 +73,12 @@ Install Basler Pylon SDK to `/opt`:
 ~ $ tar xvvf pylon-5.0.9.10389-armhf.tar.gz
 ~ $ cd pylon-5.0.9.10389-armhf
 ~/pylon-5.0.9.10389-armhf $ sudo tar -C /opt -xzf pylonSDK-5.0.9.10389-armhf.tar.gz
+~/pylon-5.0.9.10389-armhf $ cd
 ```
 
 Clone this repository:
 
 ```bash
-~/pylon-5.0.9.10389-armhf $ cd
 ~ $ git clone https://github.com/peppincsoda/stripe-filter-v2
 ```
 
@@ -164,5 +166,43 @@ If you also need Basler camera support you have to build `BaslerLib` in the `bas
 
 ## Usage
 
-Coming soon...
+The application can get command line arguments: `--gui` to show the UI allowing to configure and fine tune the parameters
+and `--settings-file` which receives the path to the file that will hold all parameter values.
+
+### Settings on the UI:
+
++ *Filter*:
+  + *Optimize ROI*: When turned on, the program will shrink the user-defined ROI to contain only pixels that
+    actually affect the measurement to reduce the CPU load.
+  + *Use Median*, *Kernel size*: Whether to apply median filtering and its kernel size.
+  + *Use Gaussian*, *Kernel size*, *Sigma*: Whether to apply Gaussian filtering and its parameters.
+  + *Use Box*, *Kernel size*: Whether to apply box filtering and its kernel size.
+  + *Use Threshold*, *Threshold value*: Whether to apply binary thresholding and the value of the threshold.
+  + *Black object*: When turned on, the search will look for the first black pixels from the left and right
+    end of the centerline in the ROI, otherwise it will look for the first white pixels.
++ *Serial Port*: The usual serial port settings.
+  + *Port name*: `COM1`, `COM2`, etc. on Windows and `ttyS0`, `ttyS1`, `ttyUSB0`, etc. on Linux.
++ *Modbus*:
+  + *Slave address*: The address of the Modbus slave device (the PLC).
+  + *Data address*: The address of the first register the program will send the results.
+
+### Modbus output
+
+If serial output mode is turned on, the program will set the 16-bit register with address *Data address* on the Modbus
+slave device to the measurement value. The next register will be set according to the status of the sensor:
+
+Numeric value | Status string on the console | Meaning
+--- | --- | ---
+0 | OK | The measurement value is valid.
+1 | ProcessingFailed | The object was not found in the input image.
+2 | ProcessingInvalidParams | Invalid parameters were specified (like an empty ROI).
+3 | InputFailed | Failed to read the input image. (E.g. connection to the camera is lost.)
+
+## Known bugs
+
+## License
+
+MIT
+
+If you have any questions, ideas, suggestions, or need help with this project, feel free to contact me.
 
