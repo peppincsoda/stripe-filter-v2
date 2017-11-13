@@ -188,8 +188,15 @@ and `--settings-file` which receives the path to the file that will hold all par
 
 ### Modbus output
 
-If serial output mode is turned on, the program will set the 16-bit register with address *Data address* on the Modbus
-slave device to the measurement value. The next register will be set according to the status of the sensor:
+If serial output mode is turned on, the program will set consecutive 16-bit registers starting with address *Data address* on the Modbus slave device. The outputs are the following:
+
+Address Offset | Number of 16-bit registers | Value
+--- | --- | ---
++0 | 1 | The measurement value.
++1 | 1 | The status of the sensor. (See below for status codes.)
++2 | 2 | The entropy of the histogram of the ROI given as a 32-bit float value. (Used for contrast detection.)
+
+Status codes:
 
 Numeric value | Status string on the console | Meaning
 --- | --- | ---
