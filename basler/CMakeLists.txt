@@ -6,6 +6,10 @@ file(GLOB SRCS *.cpp)
 
 add_library(${PROJECT_NAME} SHARED ${SRCS})
 
+if(NOT DEFINED ENV{PYLON_ROOT})
+    message(FATAL_ERROR "Environment variable PYLON_ROOT is not defined")
+endif()
+
 execute_process(COMMAND $ENV{PYLON_ROOT}/bin/pylon-config --cflags
     OUTPUT_VARIABLE PYLON_CFLAGS)
 string(REGEX REPLACE "[ \t\n]+$" "" PYLON_CFLAGS "${PYLON_CFLAGS}")
@@ -15,7 +19,7 @@ string(REGEX REPLACE "[ \t\n]+$" "" PYLON_LDFLAGS "${PYLON_LDFLAGS}")
 execute_process(COMMAND $ENV{PYLON_ROOT}/bin/pylon-config --libs
     OUTPUT_VARIABLE PYLON_LDLIBS)
 string(REGEX REPLACE "[ \t\n]+$" "" PYLON_LDLIBS "${PYLON_LDLIBS}")
-    
+
 target_include_directories(${PROJECT_NAME}
     PUBLIC
     ${MY_ROOT_DIR})
