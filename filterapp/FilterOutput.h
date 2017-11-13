@@ -11,6 +11,7 @@ namespace sfv2 {
         ProcessingFailed,
         ProcessingInvalidParams,
         InputFailed,
+        UnknownStatus = -1,
     };
 
     struct FilterOutputData
@@ -18,7 +19,10 @@ namespace sfv2 {
         int left_dist;
         int right_dist;
         int measurement;
+        double entropy;
         FilterStatus status;
+
+        void reset();
     };
 
     class FilterOutput

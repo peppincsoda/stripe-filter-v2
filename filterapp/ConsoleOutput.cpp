@@ -16,6 +16,8 @@ namespace sfv2 {
             return "ProcessingInvalidParams";
         case FilterStatus::InputFailed:
             return "InputFailed";
+        case FilterStatus::UnknownStatus:
+            return "UnknownStatus";
         }
         return "?";
     }
@@ -40,6 +42,7 @@ namespace sfv2 {
         std::cout << " L:" << std::setw(5) << std::right << data.left_dist
                   << " R:" << std::setw(5) << std::right << data.right_dist
                   << " OUTPUT:" << std::setw(5) << std::right << data.measurement
+                  << " ENTROPY:" << std::setw(8) << std::right << data.entropy
                   << " STATUS:" << getFilterStatusStr(data.status) << " | \r";
         return true;
     }

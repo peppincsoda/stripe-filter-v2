@@ -102,9 +102,7 @@ namespace sfv2 {
         if (tryReadInput(input_data)) {
             processFrame(input_data, output_data);
         } else {
-            output_data.left_dist = 0;
-            output_data.right_dist = 0;
-            output_data.measurement = 0;
+            output_data.reset();
             output_data.status = FilterStatus::InputFailed;
         }
 
@@ -265,10 +263,13 @@ namespace sfv2 {
 
             applyLowPassFilters(*proc_img);
 
-            // Compute histogram if running interactively
+            cv::Mat hist;
+            computeHistogram(*proc_img, hist, output_data.entropy);
+
+            // Draw histogram if running interactively
             if (main_window_ != nullptr) {
                 cv::Mat hist_img;
-                createHistogram(*proc_img, hist_img);
+                drawHistogram(hist, hist_img);
                 main_window_->setHistImage(QImage(hist_img.data,
                                                   hist_img.cols,
                                                   hist_img.rows,
@@ -282,9 +283,7 @@ namespace sfv2 {
 
         } else {
             // Invalid ROI parameters
-            output_data.left_dist = 0;
-            output_data.right_dist = 0;
-            output_data.measurement = 0;
+            output_data.reset();
             output_data.status = FilterStatus::ProcessingInvalidParams;
         }
 
@@ -370,19 +369,29 @@ namespace sfv2 {
         }
     }
 
-    void FilterApplication::createHistogram(const cv::Mat& img, cv::Mat& hist_img)
+    void FilterApplication::computeHistogram(const cv::Mat& img, cv::Mat& hist, double& entropy)
     {
         int channels[] = { 0 };
-        int num_bins[] = { 256 };
+        const int num_bins = 256;
         float sranges[] = { 0, 256 };
         const float* ranges[] = { sranges };
-        cv::Mat hist;
 
         cv::calcHist(&img, 1, channels, cv::Mat(), // do not use mask
-                     hist, 1, num_bins, ranges,
+                     hist, 1, &num_bins, ranges,
                      true, // the histogram is uniform
-                     false // clear the result matrix before calculation
+                     true  // clear the result matrix before calculation
                      );
+        cv::normalize(hist, hist);
+
+        // Compute entropy
+        cv::Mat log_p;
+        cv::log(hist, log_p);
+        entropy = -cv::sum(hist.mul(log_p)).val[0];
+    }
+
+    void FilterApplication::drawHistogram(cv::Mat& hist, cv::Mat& hist_img)
+    {
+        assert(main_window_ != nullptr);
 
         const auto hist_height = main_window_->histDisplayHeight();
         cv::normalize(hist, hist, hist_height);
@@ -390,8 +399,9 @@ namespace sfv2 {
         //cv::minMaxLoc(hist, 0, &max_val, 0, 0);
 
         // Generate histogram image
-        hist_img = cv::Mat::zeros(hist_height, num_bins[0], CV_8UC1);
-        for (int i = 0; i < num_bins[0]; i++) {
+        const int num_bins = 256;
+        hist_img = cv::Mat::zeros(hist_height, num_bins, CV_8UC1);
+        for (int i = 0; i < num_bins; i++) {
             const auto bin_val = hist.at<float>(i);
             const auto intensity = cvRound(bin_val);
             //const auto intensity = cvRound(bin_val * hist_height / max_val);

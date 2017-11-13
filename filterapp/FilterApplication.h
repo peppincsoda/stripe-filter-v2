@@ -58,7 +58,8 @@ namespace sfv2 {
         void processFrame(const FilterInputData& input_data, FilterOutputData& output_data);
         void getRoiParams(const cv::Mat& img, QPoint& roi_p, QSize& roi_size);
         void applyLowPassFilters(cv::Mat& img);
-        void createHistogram(const cv::Mat& img, cv::Mat& hist_img);
+        void computeHistogram(const cv::Mat& img, cv::Mat& hist, double& entropy);
+        void drawHistogram(cv::Mat& hist, cv::Mat& hist_img);
         void applyThresholding(cv::Mat& img);
         void findObject(const cv::Mat& img, FilterOutputData& output_data);
         void optimizeRoi(QPoint& roi_p, QSize& roi_size);
