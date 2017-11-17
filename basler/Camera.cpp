@@ -48,6 +48,7 @@ namespace basler {
                 std::unique_ptr<CBaslerGigEInstantCamera> camera(new CBaslerGigEInstantCamera(device.get()));
                 device.release();
 
+                // Do not set any values directly from code to prevent 'Node is not writeable' error on opening
                 //camera_->PixelFormat.SetValue(Basler_GigECamera::PixelFormat_Mono8);
                 //camera->AcquisitionMode.SetValue(Basler_GigECameraParams::AcquisitionMode_Continuous);
                 //camera->GevSCPSPacketSize = 1500;
