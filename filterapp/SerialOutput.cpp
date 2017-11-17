@@ -62,11 +62,6 @@ namespace sfv2 {
 
     bool SerialOutput::write(const FilterOutputData& data)
     {
-        if (data.measurement < 0 || data.measurement > UINT16_MAX) {
-            qWarning() << "Measurement value out of range";
-            return false;
-        }
-
         // Convert entropy to 32-bit float and copy it bit-by-bit to an integer
         const auto f_entropy = static_cast<float>(data.entropy);
         const auto i_entropy = *reinterpret_cast<const uint32_t*>(&f_entropy);

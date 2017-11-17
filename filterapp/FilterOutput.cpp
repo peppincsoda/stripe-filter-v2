@@ -6,7 +6,7 @@ namespace sfv2 {
     {
         left_dist = 0;
         right_dist = 0;
-        measurement = -1;
+        measurement = 0;
         entropy = 0;
         status = FilterStatus::UnknownStatus;
     }
