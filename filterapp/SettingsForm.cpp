@@ -74,7 +74,8 @@ namespace sfv2 {
         : QWidget(parent, flags)
         , pimpl_(new Impl(settings, this))
     {
-
+        auto* layout = new QHBoxLayout(this);
+        layout->addWidget(pimpl_);
     }
 
     SettingsForm::~SettingsForm()
