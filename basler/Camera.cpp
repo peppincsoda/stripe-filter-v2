@@ -49,9 +49,9 @@ namespace basler {
                 device.release();
 
                 //camera_->PixelFormat.SetValue(Basler_GigECamera::PixelFormat_Mono8);
-                camera->AcquisitionMode.SetValue(Basler_GigECameraParams::AcquisitionMode_Continuous);
-                camera->GevSCPSPacketSize = 1500;
-                camera->MaxNumBuffer = 2;
+                //camera->AcquisitionMode.SetValue(Basler_GigECameraParams::AcquisitionMode_Continuous);
+                //camera->GevSCPSPacketSize = 1500;
+                //camera->MaxNumBuffer = 2;
 
                 camera_ = std::move(camera);
 
