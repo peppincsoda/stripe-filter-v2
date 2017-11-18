@@ -22,6 +22,9 @@ namespace sfv2 {
         int histDisplayHeight() const;
         void setHistImage(QImage&& qimg);
 
+    Q_SIGNALS:
+        void testResetClicked(bool);
+
     private:
         class Impl;
         Impl* pimpl_;

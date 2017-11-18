@@ -28,6 +28,7 @@ namespace sfv2 {
 
     private:
         QSettings s_;
+        bool test_mode_; // TestMode always has to be enabled explicitly
     };
 
     FilterSettings::FilterSettings(const QString& file_name, QObject* parent)
@@ -309,8 +310,72 @@ namespace sfv2 {
         }
     }
 
+    bool FilterSettings::testMode() const
+    {
+        return pimpl_->test_mode_;
+    }
+
+    void FilterSettings::setTestMode(bool test_mode)
+    {
+        pimpl_->test_mode_ = test_mode;
+    }
+
+    FilterOutputData::Status FilterSettings::testFilterStatus() const
+    {
+        return enumValueFromString<FilterOutputData::Status>(
+                    pimpl_->s_.value("test/status", "OK").toString());
+    }
+
+    void FilterSettings::setTestFilterStatus(FilterOutputData::Status status)
+    {
+        if (testFilterStatus() != status) {
+            pimpl_->s_.setValue("test/status", enumValueToString(status));
+        }
+    }
+
+    double FilterSettings::testMinMeasurement() const
+    {
+        return pimpl_->s_.value("test/min-measurement", 10).toDouble();
+    }
+
+    void FilterSettings::setTestMinMeasurement(double measurement)
+    {
+        pimpl_->s_.setValue("test/min-measurement", measurement);
+    }
+
+    double FilterSettings::testMaxMeasurement() const
+    {
+        return pimpl_->s_.value("test/max-measurement", 300).toDouble();
+    }
+
+    void FilterSettings::setTestMaxMeasurement(double measurement)
+    {
+        pimpl_->s_.setValue("test/max-measurement", measurement);
+    }
+
+    double FilterSettings::testMeasurementStep() const
+    {
+        return pimpl_->s_.value("test/measurement-step", 10).toDouble();
+    }
+
+    void FilterSettings::setTestMeasurementStep(double val_step)
+    {
+        pimpl_->s_.setValue("test/measurement-step", val_step);
+    }
+
+    int FilterSettings::testTimeStep() const
+    {
+        return pimpl_->s_.value("test/time-step", 1000).toInt();
+    }
+
+    void FilterSettings::setTestTimeStep(int time_step)
+    {
+        pimpl_->s_.setValue("test/time-step", time_step);
+    }
+
     FilterSettings::Impl::Impl(const QString& file_name)
         : s_(file_name, QSettings::IniFormat)
+        , test_mode_(false)
     {
 
     }

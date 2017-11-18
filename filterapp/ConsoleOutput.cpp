@@ -1,25 +1,16 @@
 #include "ConsoleOutput.h"
 
+#include <QMetaEnum>
+
 #include <iomanip>
 #include <iostream>
 
 namespace sfv2 {
 
-    static const char* getFilterStatusStr(FilterStatus status)
+    static const char* getFilterStatusStr(FilterOutputData::Status status)
     {
-        switch (status) {
-        case FilterStatus::OK:
-            return "OK";
-        case FilterStatus::ProcessingFailed:
-            return "ProcessingFailed";
-        case FilterStatus::ProcessingInvalidParams:
-            return "ProcessingInvalidParams";
-        case FilterStatus::InputFailed:
-            return "InputFailed";
-        case FilterStatus::UnknownStatus:
-            return "UnknownStatus";
-        }
-        return "?";
+        return QMetaEnum::fromType<FilterOutputData::Status>()
+                .valueToKey(static_cast<int>(status));
     }
 
     ConsoleOutput::ConsoleOutput()
@@ -39,11 +30,11 @@ namespace sfv2 {
 
     bool ConsoleOutput::write(const FilterOutputData& data)
     {
-        std::cout << " L:" << std::setw(5) << std::right << data.left_dist
-                  << " R:" << std::setw(5) << std::right << data.right_dist
-                  << " OUTPUT:" << std::setw(5) << std::right << data.measurement
-                  << " ENTROPY:" << std::setw(8) << std::right << data.entropy
-                  << " STATUS:" << getFilterStatusStr(data.status) << " | \r";
+        std::cout << " L:" << std::setw(5) << std::right << data.leftDist()
+                  << " R:" << std::setw(5) << std::right << data.rightDist()
+                  << " OUTPUT:" << std::setw(5) << std::right << data.measurement()
+                  << " ENTROPY:" << std::setw(8) << std::right << data.entropy()
+                  << " STATUS:" << getFilterStatusStr(data.status()) << " | \r";
         return true;
     }
 }

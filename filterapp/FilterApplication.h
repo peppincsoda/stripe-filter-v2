@@ -8,6 +8,7 @@
 #include <memory>
 
 class QTimer;
+class QElapsedTimer;
 
 namespace cv {
     class Mat;
@@ -40,6 +41,8 @@ namespace sfv2 {
 
         void setMainWindow(MainWindow* main_window);
 
+        void resetTest();
+
     Q_SIGNALS:
         void quit();
 
@@ -56,6 +59,7 @@ namespace sfv2 {
         bool tryReadInput(FilterInputData& data);
         bool tryWriteOutput(const FilterOutputData& data);
         void processFrame(const FilterInputData& input_data, FilterOutputData& output_data);
+        void processTestMode(FilterOutputData& output_data);
         void getRoiParams(const cv::Mat& img, QPoint& roi_p, QSize& roi_size);
         void applyLowPassFilters(cv::Mat& img);
         void computeHistogram(const cv::Mat& img, cv::Mat& hist, double& entropy);
@@ -66,6 +70,7 @@ namespace sfv2 {
 
         std::unique_ptr<FilterSettings> settings_;
         std::unique_ptr<QTimer> idle_timer_;
+        std::unique_ptr<QElapsedTimer> test_timer_;
 
         std::unique_ptr<FilterInput> input_;
         std::unique_ptr<FilterOutput> output_;

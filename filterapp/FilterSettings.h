@@ -1,6 +1,8 @@
 #ifndef FILTERSETTINGS_H
 #define FILTERSETTINGS_H
 
+#include "FilterOutput.h"
+
 #include <QPoint>
 #include <QSize>
 #include <QSerialPort>
@@ -35,6 +37,12 @@ namespace sfv2 {
         Q_PROPERTY(QSerialPort::FlowControl SerialFlowControl READ serialFlowControl WRITE setSerialFlowControl)
         Q_PROPERTY(int ModbusSlaveAddress READ modbusSlaveAddress WRITE setModbusSlaveAddress)
         Q_PROPERTY(int ModbusDataAddress READ modbusDataAddress WRITE setModbusDataAddress)
+        Q_PROPERTY(bool TestMode READ testMode WRITE setTestMode)
+        Q_PROPERTY(FilterOutputData::Status TestFilterStatus READ testFilterStatus WRITE setTestFilterStatus)
+        Q_PROPERTY(double TestMinMeasurement READ testMinMeasurement WRITE setTestMinMeasurement)
+        Q_PROPERTY(double TestMaxMeasurement READ testMaxMeasurement WRITE setTestMaxMeasurement)
+        Q_PROPERTY(double TestMeasurementStep READ testMeasurementStep WRITE setTestMeasurementStep)
+        Q_PROPERTY(int TestTimeStep READ testTimeStep WRITE setTestTimeStep)
     public:
         enum InputType
         {
@@ -128,6 +136,24 @@ namespace sfv2 {
 
         int modbusDataAddress() const;
         void setModbusDataAddress(int address);
+
+        bool testMode() const;
+        void setTestMode(bool test_mode);
+
+        FilterOutputData::Status testFilterStatus() const;
+        void setTestFilterStatus(FilterOutputData::Status status);
+
+        double testMinMeasurement() const;
+        void setTestMinMeasurement(double measurement);
+
+        double testMaxMeasurement() const;
+        void setTestMaxMeasurement(double measurement);
+
+        double testMeasurementStep() const;
+        void setTestMeasurementStep(double val_step);
+
+        int testTimeStep() const;
+        void setTestTimeStep(int time_step);
 
     Q_SIGNALS:
         void inputTypeChanged();

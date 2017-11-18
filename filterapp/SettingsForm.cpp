@@ -37,7 +37,7 @@ namespace sfv2 {
     public:
         friend class SettingsForm;
 
-        explicit Impl(FilterSettings* settings, QWidget *parent = nullptr);
+        Impl(FilterSettings* settings, QWidget *parent);
         ~Impl();
 
     private Q_SLOTS:
@@ -62,6 +62,12 @@ namespace sfv2 {
         void onFlowControlChanged();
         void onModbusSlaveAddressChanged();
         void onModbusDataAddressChanged();
+        void onTestModeChanged();
+        void onTestFilterStatusChanged();
+        void onMinValueChanged();
+        void onMaxValueChanged();
+        void onValueStepChanged();
+        void onTimeStepChanged();
 
     private:
         Ui::SettingsForm *ui;
@@ -108,6 +114,7 @@ namespace sfv2 {
         , settings_(settings)
     {
         assert(settings != nullptr);
+        assert(parent != nullptr);
 
         ui->setupUi(this);
 
@@ -211,6 +218,35 @@ namespace sfv2 {
         ui->modbusDataAddressSpinBox->setValue(settings_->modbusDataAddress());
         connect(ui->modbusDataAddressSpinBox, SIGNAL(valueChanged(int)),
                 this, SLOT(onModbusDataAddressChanged()));
+
+        // Test
+        ui->testModeCheckBox->setChecked(settings_->testMode());
+        connect(ui->testModeCheckBox, SIGNAL(toggled(bool)),
+                this, SLOT(onTestModeChanged()));
+
+        addEnumValues<FilterOutputData::Status>(ui->testFilterStatusComboBox);
+        setCurrentIndexFromData(ui->testFilterStatusComboBox, settings_->testFilterStatus());
+        connect(ui->testFilterStatusComboBox, SIGNAL(currentIndexChanged(int)),
+                this, SLOT(onTestFilterStatusChanged()));
+
+        ui->minValueDoubleSpinBox->setValue(settings_->testMinMeasurement());
+        connect(ui->minValueDoubleSpinBox, SIGNAL(valueChanged(double)),
+                this, SLOT(onMinValueChanged()));
+
+        ui->maxValueDoubleSpinBox->setValue(settings_->testMaxMeasurement());
+        connect(ui->maxValueDoubleSpinBox, SIGNAL(valueChanged(double)),
+                this, SLOT(onMaxValueChanged()));
+
+        ui->valueStepDoubleSpinBox->setValue(settings_->testMeasurementStep());
+        connect(ui->valueStepDoubleSpinBox, SIGNAL(valueChanged(double)),
+                this, SLOT(onValueStepChanged()));
+
+        ui->timeStepSpinBox->setValue(settings_->testTimeStep());
+        connect(ui->timeStepSpinBox, SIGNAL(valueChanged(int)),
+                this, SLOT(onTimeStepChanged()));
+
+        connect(ui->resetPushButton, SIGNAL(clicked(bool)),
+                parent, SIGNAL(testResetClicked(bool)));
     }
 
     SettingsForm::Impl::~Impl()
@@ -321,6 +357,36 @@ namespace sfv2 {
     void SettingsForm::Impl::onModbusDataAddressChanged()
     {
         settings_->setModbusDataAddress(ui->modbusDataAddressSpinBox->value());
+    }
+
+    void SettingsForm::Impl::onTestModeChanged()
+    {
+        settings_->setTestMode(ui->testModeCheckBox->isChecked());
+    }
+
+    void SettingsForm::Impl::onTestFilterStatusChanged()
+    {
+        settings_->setTestFilterStatus(static_cast<FilterOutputData::Status>(ui->testFilterStatusComboBox->currentData().toInt()));
+    }
+
+    void SettingsForm::Impl::onMinValueChanged()
+    {
+        settings_->setTestMinMeasurement(ui->minValueDoubleSpinBox->value());
+    }
+
+    void SettingsForm::Impl::onMaxValueChanged()
+    {
+        settings_->setTestMaxMeasurement(ui->maxValueDoubleSpinBox->value());
+    }
+
+    void SettingsForm::Impl::onValueStepChanged()
+    {
+        settings_->setTestMeasurementStep(ui->valueStepDoubleSpinBox->value());
+    }
+
+    void SettingsForm::Impl::onTimeStepChanged()
+    {
+        settings_->setTestTimeStep(ui->timeStepSpinBox->value());
     }
 
 }

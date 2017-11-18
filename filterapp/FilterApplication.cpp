@@ -30,6 +30,7 @@ namespace sfv2 {
         : QObject(parent)
         , settings_()
         , idle_timer_()
+        , test_timer_()
         , input_()
         , output_()
         , input_handler_(3, 1000, 30000, [this]() { return openInput(); })
@@ -40,6 +41,9 @@ namespace sfv2 {
         connect(idle_timer_.get(), SIGNAL(timeout()), this, SLOT(onIdle()));
         idle_timer_->setSingleShot(true);
         idle_timer_->start(0);
+
+        test_timer_ = std::make_unique<QElapsedTimer>();
+        test_timer_->start();
     }
 
     FilterApplication::~FilterApplication()
@@ -75,6 +79,11 @@ namespace sfv2 {
         main_window_ = main_window;
     }
 
+    void FilterApplication::resetTest()
+    {
+        test_timer_->start();
+    }
+
     void FilterApplication::onIdle()
     {
         if (exit_requested_) {
@@ -93,17 +102,23 @@ namespace sfv2 {
 
     void FilterApplication::doFrame()
     {
-        FilterInputData input_data;
         FilterOutputData output_data;
 
-        cv::Mat frame;
-        input_data.frame = &frame;
+        if (settings_->testMode()) {
+            processTestMode(output_data);
 
-        if (tryReadInput(input_data)) {
-            processFrame(input_data, output_data);
         } else {
-            output_data.reset();
-            output_data.status = FilterStatus::InputFailed;
+            FilterInputData input_data;
+
+            cv::Mat frame;
+            input_data.frame = &frame;
+
+            if (tryReadInput(input_data)) {
+                processFrame(input_data, output_data);
+            } else {
+                output_data.reset();
+                output_data.setStatus(FilterOutputData::InputFailed);
+            }
         }
 
         tryWriteOutput(output_data);
@@ -264,7 +279,11 @@ namespace sfv2 {
             applyLowPassFilters(*proc_img);
 
             cv::Mat hist;
-            computeHistogram(*proc_img, hist, output_data.entropy);
+            {
+                double entropy = 0;
+                computeHistogram(*proc_img, hist, entropy);
+                output_data.setEntropy(entropy);
+            }
 
             // Draw histogram if running interactively
             if (main_window_ != nullptr) {
@@ -284,7 +303,7 @@ namespace sfv2 {
         } else {
             // Invalid ROI parameters
             output_data.reset();
-            output_data.status = FilterStatus::ProcessingInvalidParams;
+            output_data.setStatus(FilterOutputData::ProcessingInvalidParams);
         }
 
         // Send data to the UI
@@ -295,6 +314,28 @@ namespace sfv2 {
                                                    input_img->step,
                                                    QImage::Format_Grayscale8),
                                                    output_data);
+        }
+    }
+
+    void FilterApplication::processTestMode(FilterOutputData& output_data)
+    {
+        output_data.setStatus(settings_->testFilterStatus());
+
+        const auto elapsed = test_timer_->elapsed();
+
+        const auto min_val = settings_->testMinMeasurement();
+        const auto max_val = settings_->testMaxMeasurement();
+        const auto val_step = settings_->testMeasurementStep();
+        const auto time_step = settings_->testTimeStep();
+
+        if (time_step == 0) {
+            output_data.setMeasurement(0, 0, 0);
+            output_data.setEntropy(0);
+        } else {
+            const auto val = min_val + (elapsed / time_step) * val_step;
+            const auto clamped_val = max_val < val ? max_val : val;
+            output_data.setMeasurement(0, 0, clamped_val);
+            output_data.setEntropy(clamped_val);
         }
     }
 
@@ -444,18 +485,15 @@ namespace sfv2 {
             col_right--;
         }
 
-        output_data.left_dist = col_left;
-        output_data.right_dist = col_right;
-
         if (col_left >= img.cols ||
             col_right < 0 ||
             col_left > col_right) {
 
-            output_data.measurement = 0;
-            output_data.status = FilterStatus::ProcessingFailed;
+            output_data.setMeasurement(col_left, col_right, 0);
+            output_data.setStatus(FilterOutputData::ProcessingFailed);
         } else {
-            output_data.measurement = col_right - col_left + 1;
-            output_data.status = FilterStatus::OK;
+            output_data.setMeasurement(col_left, col_right, col_right - col_left + 1);
+            output_data.setStatus(FilterOutputData::OK);
         }
     }
 

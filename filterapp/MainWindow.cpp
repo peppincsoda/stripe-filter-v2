@@ -41,6 +41,8 @@ namespace sfv2 {
                 this, SLOT(close()));
 
         settings_form_ = new SettingsForm(&app_->settings(), this, Qt::Tool);
+        connect(settings_form_, SIGNAL(testResetClicked(bool)),
+                this, SLOT(onResetTest()));
         settings_form_->show();
 
         connect(ui->actionShowSettings, SIGNAL(triggered(bool)),
@@ -70,10 +72,10 @@ namespace sfv2 {
         QPainter p(&pixmap);
 
         p.setPen(Qt::yellow);
-        const auto xleft = roi_p.x() + output_data.left_dist;
+        const auto xleft = roi_p.x() + output_data.leftDist();
         p.drawLine(xleft, roi_p.y(), xleft, roi_p.y() + roi_size.height());
         p.setPen(Qt::red);
-        const auto xright = roi_p.x() + output_data.right_dist;
+        const auto xright = roi_p.x() + output_data.rightDist();
         p.drawLine(xright, roi_p.y(), xright, roi_p.y() + roi_size.height());
 
         p.end();
@@ -96,5 +98,10 @@ namespace sfv2 {
     void MainWindow::onShowSettings()
     {
         settings_form_->show();
+    }
+
+    void MainWindow::onResetTest()
+    {
+        app_->resetTest();
     }
 }

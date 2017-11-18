@@ -30,6 +30,7 @@ namespace sfv2 {
     private Q_SLOTS:
         void onRoiChanged(const QPoint& top_left, const QSize& size);
         void onShowSettings();
+        void onResetTest();
 
     private:
         Ui::MainWindow *ui;
