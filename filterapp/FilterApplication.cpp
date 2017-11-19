@@ -19,7 +19,7 @@
 namespace sfv2 {
 
     static bool exit_requested_ = false;
-    static int min_period_ms_ = 50;
+    static const int min_period_ms_ = 50;
 
     void FilterApplication::requestExit()
     {
@@ -31,6 +31,9 @@ namespace sfv2 {
         , settings_()
         , idle_timer_()
         , test_timer_()
+        , fps_timer_()
+        , frames_this_second_(0)
+        , fps_(0)
         , input_()
         , output_()
         , input_handler_(3, 1000, 30000, [this]() { return openInput(); })
@@ -44,6 +47,9 @@ namespace sfv2 {
 
         test_timer_ = std::make_unique<QElapsedTimer>();
         test_timer_->start();
+
+        fps_timer_ = std::make_unique<QElapsedTimer>();
+        fps_timer_->start();
     }
 
     FilterApplication::~FilterApplication()
@@ -96,6 +102,14 @@ namespace sfv2 {
 
         doFrame();
 
+        // Measure FPS
+        frames_this_second_++;
+        if (fps_timer_->elapsed() > 1000) {
+            fps_ = frames_this_second_;
+            frames_this_second_ = 0;
+            fps_timer_->start();
+        }
+
         // Never process the next frame before min_period_ms_ has been elapsed
         idle_timer_->start(std::max(min_period_ms_ - static_cast<int>(timer.elapsed()), 0));
     }
@@ -103,6 +117,7 @@ namespace sfv2 {
     void FilterApplication::doFrame()
     {
         FilterOutputData output_data;
+        output_data.setFps(fps_);
 
         if (settings_->testMode()) {
             processTestMode(output_data);

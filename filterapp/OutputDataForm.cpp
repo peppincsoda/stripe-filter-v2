@@ -26,6 +26,7 @@ namespace sfv2 {
         ui->entropyLabel->setText(QString::number(output_data.entropy()));
         ui->statusLabel->setText(QMetaEnum::fromType<decltype(output_data.status())>()
                                     .valueToKey(static_cast<int>(output_data.status())));
+        ui->fpsLabel->setText(QString::number(output_data.fps()));
     }
 
 

@@ -71,6 +71,9 @@ namespace sfv2 {
         std::unique_ptr<FilterSettings> settings_;
         std::unique_ptr<QTimer> idle_timer_;
         std::unique_ptr<QElapsedTimer> test_timer_;
+        std::unique_ptr<QElapsedTimer> fps_timer_;
+        int frames_this_second_;
+        int fps_;
 
         std::unique_ptr<FilterInput> input_;
         std::unique_ptr<FilterOutput> output_;

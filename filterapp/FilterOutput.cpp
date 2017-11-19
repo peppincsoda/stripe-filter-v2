@@ -8,6 +8,7 @@ namespace sfv2 {
         , right_dist_(0)
         , measurement_(0)
         , entropy_(0)
+        , fps_(0)
     {
 
     }
@@ -54,6 +55,16 @@ namespace sfv2 {
         entropy_ = entropy;
     }
 
+    int FilterOutputData::fps() const
+    {
+        return fps_;
+    }
+
+    void FilterOutputData::setFps(int fps)
+    {
+        fps_ = fps;
+    }
+
     void FilterOutputData::reset()
     {
         status_ = UnknownStatus;
@@ -61,6 +72,7 @@ namespace sfv2 {
         right_dist_ = 0;
         measurement_ = 0;
         entropy_ = 0;
+        fps_ = 0;
     }
 
 }

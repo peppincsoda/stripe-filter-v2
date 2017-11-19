@@ -35,6 +35,9 @@ namespace sfv2 {
         double entropy() const;
         void setEntropy(double entropy);
 
+        int fps() const;
+        void setFps(int fps);
+
         void reset();
 
     private:
@@ -45,6 +48,8 @@ namespace sfv2 {
         int measurement_;
 
         double entropy_;
+
+        int fps_;
     };
 
     class FilterOutput
