@@ -47,16 +47,21 @@
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menu_View">
-    <property name="title">
-     <string>&amp;View</string>
-    </property>
-    <addaction name="actionShowSettings"/>
-   </widget>
    <addaction name="menu_Commands"/>
-   <addaction name="menu_View"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="settingsDockWidget">
+   <property name="features">
+    <set>QDockWidget::NoDockWidgetFeatures</set>
+   </property>
+   <property name="windowTitle">
+    <string>Settings</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="sfv2::SettingsForm" name="settingsForm"/>
+  </widget>
   <action name="actionSelectRoi">
    <property name="checkable">
     <bool>true</bool>
@@ -90,6 +95,12 @@
    <class>sfv2::ImageView</class>
    <extends>QLabel</extends>
    <header>ImageView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>sfv2::SettingsForm</class>
+   <extends>QWidget</extends>
+   <header>SettingsForm.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

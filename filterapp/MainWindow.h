@@ -12,7 +12,6 @@ class QImage;
 namespace sfv2 {
 
     class FilterApplication;
-    class SettingsForm;
     struct FilterOutputData;
 
     class MainWindow : public QMainWindow
@@ -29,13 +28,11 @@ namespace sfv2 {
 
     private Q_SLOTS:
         void onRoiChanged(const QPoint& top_left, const QSize& size);
-        void onShowSettings();
         void onResetTest();
 
     private:
         Ui::MainWindow *ui;
         FilterApplication* app_;
-        SettingsForm* settings_form_;
     };
 
 }

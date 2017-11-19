@@ -37,8 +37,10 @@ namespace sfv2 {
     public:
         friend class SettingsForm;
 
-        Impl(FilterSettings* settings, QWidget *parent);
+        explicit Impl(QWidget *parent);
         ~Impl();
+
+        void setSettings(FilterSettings* settings);
 
     private Q_SLOTS:
         void onInputTypeChanged();
@@ -76,9 +78,9 @@ namespace sfv2 {
 
 
 
-    SettingsForm::SettingsForm(FilterSettings* settings, QWidget *parent, Qt::WindowFlags flags)
+    SettingsForm::SettingsForm(QWidget *parent, Qt::WindowFlags flags)
         : QWidget(parent, flags)
-        , pimpl_(new Impl(settings, this))
+        , pimpl_(new Impl(this))
     {
         auto* layout = new QHBoxLayout(this);
         layout->addWidget(pimpl_);
@@ -87,6 +89,11 @@ namespace sfv2 {
     SettingsForm::~SettingsForm()
     {
 
+    }
+
+    void SettingsForm::setSettings(FilterSettings *settings)
+    {
+        pimpl_->setSettings(settings);
     }
 
     int SettingsForm::histDisplayHeight() const
@@ -108,143 +115,95 @@ namespace sfv2 {
         pimpl_->ui->histogramLabel->setPixmap(std::move(pixmap));
     }
 
-    SettingsForm::Impl::Impl(FilterSettings* settings, QWidget *parent)
+    SettingsForm::Impl::Impl(QWidget *parent)
         : QWidget(parent)
         , ui(new Ui::SettingsForm)
-        , settings_(settings)
+        , settings_(nullptr)
     {
-        assert(settings != nullptr);
         assert(parent != nullptr);
 
         ui->setupUi(this);
 
         // Input/Output
         addEnumValues<FilterSettings::InputType>(ui->inputTypeComboBox);
-        setCurrentIndexFromData(ui->inputTypeComboBox, settings_->inputType());
         connect(ui->inputTypeComboBox, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(onInputTypeChanged()));
-
         addEnumValues<FilterSettings::OutputType>(ui->outputTypeComboBox);
-        setCurrentIndexFromData(ui->outputTypeComboBox, settings_->outputType());
         connect(ui->outputTypeComboBox, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(onOutputTypeChanged()));
-
-        ui->optimizeRoiCheckBox->setChecked(settings_->optimizeRoi());
         connect(ui->optimizeRoiCheckBox, SIGNAL(toggled(bool)),
                 this, SLOT(onOptimizeRoiChanged()));
 
         // Median
-        ui->useMedianCheckBox->setChecked(settings_->useMedian());
         connect(ui->useMedianCheckBox, SIGNAL(toggled(bool)),
                 this, SLOT(onUseMedianChanged()));
-
         addKSizeValues(ui->medianKSizeComboBox);
-        setCurrentIndexFromData(ui->medianKSizeComboBox, settings_->medianKSize());
         connect(ui->medianKSizeComboBox, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(onMedianKSizeChanged()));
 
         // Gaussian
-        ui->useGaussianCheckBox->setChecked(settings_->useGaussian());
         connect(ui->useGaussianCheckBox, SIGNAL(toggled(bool)),
                 this, SLOT(onUseGaussianChanged()));
-
         addKSizeValues(ui->gaussianKSizeComboBox);
-        setCurrentIndexFromData(ui->gaussianKSizeComboBox, settings_->gaussianKSize());
         connect(ui->gaussianKSizeComboBox, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(onGaussianKSizeChanged()));
-
-        ui->gaussianSigmaDoubleSpinBox->setValue(settings_->gaussianSigma());
         connect(ui->gaussianSigmaDoubleSpinBox, SIGNAL(valueChanged(double)),
                 this, SLOT(onGaussianSigmaChanged()));
 
         // Box
-        ui->useBoxCheckBox->setChecked(settings_->useBox());
         connect(ui->useBoxCheckBox, SIGNAL(toggled(bool)),
                 this, SLOT(onUseBoxChanged()));
-
         addKSizeValues(ui->boxKSizeComboBox);
-        setCurrentIndexFromData(ui->boxKSizeComboBox, settings_->boxKSize());
         connect(ui->boxKSizeComboBox, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(onBoxKSizeChanged()));
 
         // Threshold
-        ui->useThresholdCheckBox->setChecked(settings_->useThreshold());
         connect(ui->useThresholdCheckBox, SIGNAL(toggled(bool)),
                 this, SLOT(onUseThresholdChanged()));
-
-        ui->thresholdValueSlider->setValue(settings_->thresholdValue());
         connect(ui->thresholdValueSlider, SIGNAL(valueChanged(int)),
                 this, SLOT(onThresholdValueChanged()));
-
-        ui->blackObjectCheckBox->setChecked(settings_->blackObject());
         connect(ui->blackObjectCheckBox, SIGNAL(toggled(bool)),
                 this, SLOT(onBlackObjectChanged()));
 
         // Serial port
-        ui->portNameLineEdit->setText(settings_->serialPortName());
         connect(ui->portNameLineEdit, SIGNAL(editingFinished()),
                 this, SLOT(onPortNameChanged()));
-
         addEnumValues<QSerialPort::BaudRate>(ui->baudRateComboBox);
-        setCurrentIndexFromData(ui->baudRateComboBox, settings_->serialBaudRate());
         connect(ui->baudRateComboBox, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(onBaudRateChanged()));
-
         addEnumValues<QSerialPort::DataBits>(ui->dataBitsComboBox);
-        setCurrentIndexFromData(ui->dataBitsComboBox, settings_->serialDataBits());
         connect(ui->dataBitsComboBox, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(onDataBitsChanged()));
-
         addEnumValues<QSerialPort::Parity>(ui->parityComboBox);
-        setCurrentIndexFromData(ui->parityComboBox, settings_->serialParity());
         connect(ui->parityComboBox, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(onParityChanged()));
-
         addEnumValues<QSerialPort::StopBits>(ui->stopBitsComboBox);
-        setCurrentIndexFromData(ui->stopBitsComboBox, settings_->serialStopBits());
         connect(ui->stopBitsComboBox, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(onStopBitsChanged()));
-
         addEnumValues<QSerialPort::FlowControl>(ui->flowControlComboBox);
-        setCurrentIndexFromData(ui->flowControlComboBox, settings_->serialFlowControl());
         connect(ui->flowControlComboBox, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(onFlowControlChanged()));
 
         // Modbus
-        ui->modbusSlaveAddressSpinBox->setValue(settings_->modbusSlaveAddress());
         connect(ui->modbusSlaveAddressSpinBox, SIGNAL(valueChanged(int)),
                 this, SLOT(onModbusSlaveAddressChanged()));
-
-        ui->modbusDataAddressSpinBox->setValue(settings_->modbusDataAddress());
         connect(ui->modbusDataAddressSpinBox, SIGNAL(valueChanged(int)),
                 this, SLOT(onModbusDataAddressChanged()));
 
         // Test
-        ui->testModeCheckBox->setChecked(settings_->testMode());
         connect(ui->testModeCheckBox, SIGNAL(toggled(bool)),
                 this, SLOT(onTestModeChanged()));
-
         addEnumValues<FilterOutputData::Status>(ui->testFilterStatusComboBox);
-        setCurrentIndexFromData(ui->testFilterStatusComboBox, settings_->testFilterStatus());
         connect(ui->testFilterStatusComboBox, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(onTestFilterStatusChanged()));
-
-        ui->minValueDoubleSpinBox->setValue(settings_->testMinMeasurement());
         connect(ui->minValueDoubleSpinBox, SIGNAL(valueChanged(double)),
                 this, SLOT(onMinValueChanged()));
-
-        ui->maxValueDoubleSpinBox->setValue(settings_->testMaxMeasurement());
         connect(ui->maxValueDoubleSpinBox, SIGNAL(valueChanged(double)),
                 this, SLOT(onMaxValueChanged()));
-
-        ui->valueStepDoubleSpinBox->setValue(settings_->testMeasurementStep());
         connect(ui->valueStepDoubleSpinBox, SIGNAL(valueChanged(double)),
                 this, SLOT(onValueStepChanged()));
-
-        ui->timeStepSpinBox->setValue(settings_->testTimeStep());
         connect(ui->timeStepSpinBox, SIGNAL(valueChanged(int)),
                 this, SLOT(onTimeStepChanged()));
-
         connect(ui->resetPushButton, SIGNAL(clicked(bool)),
                 parent, SIGNAL(testResetClicked(bool)));
     }
@@ -254,139 +213,205 @@ namespace sfv2 {
         delete ui;
     }
 
+    void SettingsForm::Impl::setSettings(FilterSettings *settings)
+    {
+        settings_ = settings;
+
+        if (settings_ != nullptr) {
+            setCurrentIndexFromData(ui->inputTypeComboBox, settings_->inputType());
+            setCurrentIndexFromData(ui->outputTypeComboBox, settings_->outputType());
+
+            ui->optimizeRoiCheckBox->setChecked(settings_->optimizeRoi());
+            ui->useMedianCheckBox->setChecked(settings_->useMedian());
+            setCurrentIndexFromData(ui->medianKSizeComboBox, settings_->medianKSize());
+            ui->useGaussianCheckBox->setChecked(settings_->useGaussian());
+            setCurrentIndexFromData(ui->gaussianKSizeComboBox, settings_->gaussianKSize());
+            ui->gaussianSigmaDoubleSpinBox->setValue(settings_->gaussianSigma());
+            ui->useBoxCheckBox->setChecked(settings_->useBox());
+            setCurrentIndexFromData(ui->boxKSizeComboBox, settings_->boxKSize());
+            ui->useThresholdCheckBox->setChecked(settings_->useThreshold());
+            ui->thresholdValueSlider->setValue(settings_->thresholdValue());
+            ui->blackObjectCheckBox->setChecked(settings_->blackObject());
+
+            ui->portNameLineEdit->setText(settings_->serialPortName());
+            setCurrentIndexFromData(ui->baudRateComboBox, settings_->serialBaudRate());
+            setCurrentIndexFromData(ui->dataBitsComboBox, settings_->serialDataBits());
+            setCurrentIndexFromData(ui->parityComboBox, settings_->serialParity());
+            setCurrentIndexFromData(ui->stopBitsComboBox, settings_->serialStopBits());
+            setCurrentIndexFromData(ui->flowControlComboBox, settings_->serialFlowControl());
+
+            ui->modbusSlaveAddressSpinBox->setValue(settings_->modbusSlaveAddress());
+            ui->modbusDataAddressSpinBox->setValue(settings_->modbusDataAddress());
+
+            ui->testModeCheckBox->setChecked(settings_->testMode());
+            setCurrentIndexFromData(ui->testFilterStatusComboBox, settings_->testFilterStatus());
+            ui->minValueDoubleSpinBox->setValue(settings_->testMinMeasurement());
+            ui->maxValueDoubleSpinBox->setValue(settings_->testMaxMeasurement());
+            ui->valueStepDoubleSpinBox->setValue(settings_->testMeasurementStep());
+            ui->timeStepSpinBox->setValue(settings_->testTimeStep());
+        }
+    }
+
     void SettingsForm::Impl::onInputTypeChanged()
     {
-        settings_->setInputType(static_cast<FilterSettings::InputType>(ui->inputTypeComboBox->currentData().toInt()));
+        if (settings_ != nullptr)
+            settings_->setInputType(static_cast<FilterSettings::InputType>(ui->inputTypeComboBox->currentData().toInt()));
     }
 
     void SettingsForm::Impl::onOutputTypeChanged()
     {
-        settings_->setOutputType(static_cast<FilterSettings::OutputType>(ui->outputTypeComboBox->currentData().toInt()));
+        if (settings_ != nullptr)
+            settings_->setOutputType(static_cast<FilterSettings::OutputType>(ui->outputTypeComboBox->currentData().toInt()));
     }
 
     void SettingsForm::Impl::onOptimizeRoiChanged()
     {
-        settings_->setOptimizeRoi(ui->optimizeRoiCheckBox->isChecked());
+        if (settings_ != nullptr)
+            settings_->setOptimizeRoi(ui->optimizeRoiCheckBox->isChecked());
     }
 
     void SettingsForm::Impl::onUseMedianChanged()
     {
-        settings_->setUseMedian(ui->useMedianCheckBox->isChecked());
+        if (settings_ != nullptr)
+            settings_->setUseMedian(ui->useMedianCheckBox->isChecked());
     }
 
     void SettingsForm::Impl::onMedianKSizeChanged()
     {
-        settings_->setMedianKSize(ui->medianKSizeComboBox->currentData().toInt());
+        if (settings_ != nullptr)
+            settings_->setMedianKSize(ui->medianKSizeComboBox->currentData().toInt());
     }
 
     void SettingsForm::Impl::onUseGaussianChanged()
     {
-        settings_->setUseGaussian(ui->useGaussianCheckBox->isChecked());
+        if (settings_ != nullptr)
+            settings_->setUseGaussian(ui->useGaussianCheckBox->isChecked());
     }
 
     void SettingsForm::Impl::onGaussianKSizeChanged()
     {
-        settings_->setGaussianKSize(ui->gaussianKSizeComboBox->currentData().toInt());
+        if (settings_ != nullptr)
+            settings_->setGaussianKSize(ui->gaussianKSizeComboBox->currentData().toInt());
     }
 
     void SettingsForm::Impl::onGaussianSigmaChanged()
     {
-        settings_->setGaussianSigma(ui->gaussianSigmaDoubleSpinBox->value());
+        if (settings_ != nullptr)
+            settings_->setGaussianSigma(ui->gaussianSigmaDoubleSpinBox->value());
     }
 
     void SettingsForm::Impl::onUseBoxChanged()
     {
-        settings_->setUseBox(ui->useBoxCheckBox->isChecked());
+        if (settings_ != nullptr)
+            settings_->setUseBox(ui->useBoxCheckBox->isChecked());
     }
 
     void SettingsForm::Impl::onBoxKSizeChanged()
     {
-        settings_->setBoxKSize(ui->boxKSizeComboBox->currentData().toInt());
+        if (settings_ != nullptr)
+            settings_->setBoxKSize(ui->boxKSizeComboBox->currentData().toInt());
     }
 
     void SettingsForm::Impl::onUseThresholdChanged()
     {
-        settings_->setUseThreshold(ui->useThresholdCheckBox->isChecked());
+        if (settings_ != nullptr)
+            settings_->setUseThreshold(ui->useThresholdCheckBox->isChecked());
     }
 
     void SettingsForm::Impl::onThresholdValueChanged()
     {
-        settings_->setThresholdValue(ui->thresholdValueSlider->value());
+        if (settings_ != nullptr)
+            settings_->setThresholdValue(ui->thresholdValueSlider->value());
     }
 
     void SettingsForm::Impl::onBlackObjectChanged()
     {
-        settings_->setBlackObject(ui->blackObjectCheckBox->isChecked());
+        if (settings_ != nullptr)
+            settings_->setBlackObject(ui->blackObjectCheckBox->isChecked());
     }
 
     void SettingsForm::Impl::onPortNameChanged()
     {
-        settings_->setSerialPortName(ui->portNameLineEdit->text());
+        if (settings_ != nullptr)
+            settings_->setSerialPortName(ui->portNameLineEdit->text());
     }
 
     void SettingsForm::Impl::onBaudRateChanged()
     {
-        settings_->setSerialBaudRate(static_cast<QSerialPort::BaudRate>(ui->baudRateComboBox->currentData().toInt()));
+        if (settings_ != nullptr)
+            settings_->setSerialBaudRate(static_cast<QSerialPort::BaudRate>(ui->baudRateComboBox->currentData().toInt()));
     }
 
     void SettingsForm::Impl::onDataBitsChanged()
     {
-        settings_->setSerialDataBits(static_cast<QSerialPort::DataBits>(ui->dataBitsComboBox->currentData().toInt()));
+        if (settings_ != nullptr)
+            settings_->setSerialDataBits(static_cast<QSerialPort::DataBits>(ui->dataBitsComboBox->currentData().toInt()));
     }
 
     void SettingsForm::Impl::onParityChanged()
     {
-        settings_->setSerialParity(static_cast<QSerialPort::Parity>(ui->parityComboBox->currentData().toInt()));
+        if (settings_ != nullptr)
+            settings_->setSerialParity(static_cast<QSerialPort::Parity>(ui->parityComboBox->currentData().toInt()));
     }
 
     void SettingsForm::Impl::onStopBitsChanged()
     {
-        settings_->setSerialStopBits(static_cast<QSerialPort::StopBits>(ui->stopBitsComboBox->currentData().toInt()));
+        if (settings_ != nullptr)
+            settings_->setSerialStopBits(static_cast<QSerialPort::StopBits>(ui->stopBitsComboBox->currentData().toInt()));
     }
 
     void SettingsForm::Impl::onFlowControlChanged()
     {
-        settings_->setSerialFlowControl(static_cast<QSerialPort::FlowControl>(ui->flowControlComboBox->currentData().toInt()));
+        if (settings_ != nullptr)
+            settings_->setSerialFlowControl(static_cast<QSerialPort::FlowControl>(ui->flowControlComboBox->currentData().toInt()));
     }
 
     void SettingsForm::Impl::onModbusSlaveAddressChanged()
     {
-        settings_->setModbusSlaveAddress(ui->modbusSlaveAddressSpinBox->value());
+        if (settings_ != nullptr)
+            settings_->setModbusSlaveAddress(ui->modbusSlaveAddressSpinBox->value());
     }
 
     void SettingsForm::Impl::onModbusDataAddressChanged()
     {
-        settings_->setModbusDataAddress(ui->modbusDataAddressSpinBox->value());
+        if (settings_ != nullptr)
+            settings_->setModbusDataAddress(ui->modbusDataAddressSpinBox->value());
     }
 
     void SettingsForm::Impl::onTestModeChanged()
     {
-        settings_->setTestMode(ui->testModeCheckBox->isChecked());
+        if (settings_ != nullptr)
+            settings_->setTestMode(ui->testModeCheckBox->isChecked());
     }
 
     void SettingsForm::Impl::onTestFilterStatusChanged()
     {
-        settings_->setTestFilterStatus(static_cast<FilterOutputData::Status>(ui->testFilterStatusComboBox->currentData().toInt()));
+        if (settings_ != nullptr)
+            settings_->setTestFilterStatus(static_cast<FilterOutputData::Status>(ui->testFilterStatusComboBox->currentData().toInt()));
     }
 
     void SettingsForm::Impl::onMinValueChanged()
     {
-        settings_->setTestMinMeasurement(ui->minValueDoubleSpinBox->value());
+        if (settings_ != nullptr)
+            settings_->setTestMinMeasurement(ui->minValueDoubleSpinBox->value());
     }
 
     void SettingsForm::Impl::onMaxValueChanged()
     {
-        settings_->setTestMaxMeasurement(ui->maxValueDoubleSpinBox->value());
+        if (settings_ != nullptr)
+            settings_->setTestMaxMeasurement(ui->maxValueDoubleSpinBox->value());
     }
 
     void SettingsForm::Impl::onValueStepChanged()
     {
-        settings_->setTestMeasurementStep(ui->valueStepDoubleSpinBox->value());
+        if (settings_ != nullptr)
+            settings_->setTestMeasurementStep(ui->valueStepDoubleSpinBox->value());
     }
 
     void SettingsForm::Impl::onTimeStepChanged()
     {
-        settings_->setTestTimeStep(ui->timeStepSpinBox->value());
+        if (settings_ != nullptr)
+            settings_->setTestTimeStep(ui->timeStepSpinBox->value());
     }
 
 }

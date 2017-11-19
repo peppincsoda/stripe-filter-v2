@@ -16,7 +16,6 @@ namespace sfv2 {
         : QMainWindow(parent)
         , ui(new Ui::MainWindow)
         , app_(app)
-        , settings_form_(nullptr)
     {
         assert(app != nullptr);
 
@@ -40,13 +39,9 @@ namespace sfv2 {
         connect(ui->actionExit, SIGNAL(triggered(bool)),
                 this, SLOT(close()));
 
-        settings_form_ = new SettingsForm(&app_->settings(), this, Qt::Tool);
-        connect(settings_form_, SIGNAL(testResetClicked(bool)),
+        connect(ui->settingsForm, SIGNAL(testResetClicked(bool)),
                 this, SLOT(onResetTest()));
-        settings_form_->show();
-
-        connect(ui->actionShowSettings, SIGNAL(triggered(bool)),
-                settings_form_, SLOT(show()));
+        ui->settingsForm->setSettings(&app_->settings());
     }
 
     MainWindow::~MainWindow()
@@ -56,7 +51,7 @@ namespace sfv2 {
 
     int MainWindow::histDisplayHeight() const
     {
-        return settings_form_->histDisplayHeight();
+        return ui->settingsForm->histDisplayHeight();
     }
 
     void MainWindow::setImageAndOutput(QImage&& qimg, const FilterOutputData &output_data)
@@ -85,7 +80,7 @@ namespace sfv2 {
 
     void MainWindow::setHistImage(QImage&& qimg)
     {
-        settings_form_->setHistImage(std::move(qimg));
+        ui->settingsForm->setHistImage(std::move(qimg));
     }
 
     void MainWindow::onRoiChanged(const QPoint& top_left, const QSize& size)
@@ -93,11 +88,6 @@ namespace sfv2 {
         app_->settings().setRoiTopLeft(top_left);
         app_->settings().setRoiSize(size);
         ui->actionSelectRoi->setChecked(false);
-    }
-
-    void MainWindow::onShowSettings()
-    {
-        settings_form_->show();
     }
 
     void MainWindow::onResetTest()

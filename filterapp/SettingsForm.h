@@ -14,10 +14,11 @@ namespace sfv2 {
         Q_OBJECT
 
     public:
-        explicit SettingsForm(FilterSettings* settings,
-                              QWidget *parent = nullptr,
+        explicit SettingsForm(QWidget *parent = nullptr,
                               Qt::WindowFlags flags = Qt::WindowFlags());
         ~SettingsForm();
+
+        void setSettings(FilterSettings* settings);
 
         int histDisplayHeight() const;
         void setHistImage(QImage&& qimg);
