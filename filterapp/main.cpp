@@ -92,6 +92,7 @@ int main(int argc, char* argv[])
     if (qobject_cast<QApplication *>(app.get()) != nullptr) {
         // Show UI
         window = std::make_unique<sfv2::MainWindow>(&filter_app);
+        window->move(100, 50);
         window->show();
     } else {
         qInfo() << "Running in headless mode";
