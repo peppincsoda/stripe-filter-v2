@@ -23,7 +23,8 @@ namespace sfv2 {
 
         int histDisplayHeight() const;
 
-        void setImageAndOutput(QImage&& qimg, const FilterOutputData &output_data);
+        void setImage(QImage&& qimg, const FilterOutputData &output_data);
+        void setOutputData(const FilterOutputData &output_data);
         void setHistImage(QImage&& qimg);
 
     private Q_SLOTS:

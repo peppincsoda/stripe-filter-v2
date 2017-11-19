@@ -54,7 +54,7 @@ namespace sfv2 {
         return ui->settingsForm->histDisplayHeight();
     }
 
-    void MainWindow::setImageAndOutput(QImage&& qimg, const FilterOutputData &output_data)
+    void MainWindow::setImage(QImage&& qimg, const FilterOutputData &output_data)
     {
         auto pixmap = QPixmap::fromImage(std::move(qimg));
 
@@ -76,6 +76,11 @@ namespace sfv2 {
         p.end();
 
         ui->imageView->updateImage(std::move(pixmap));
+    }
+
+    void MainWindow::setOutputData(const FilterOutputData &output_data)
+    {
+        ui->outputDataForm->setOutputData(output_data);
     }
 
     void MainWindow::setHistImage(QImage&& qimg)

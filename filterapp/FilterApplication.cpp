@@ -121,6 +121,9 @@ namespace sfv2 {
             }
         }
 
+        if (main_window_ != nullptr)
+            main_window_->setOutputData(output_data);
+
         tryWriteOutput(output_data);
     }
 
@@ -308,12 +311,12 @@ namespace sfv2 {
 
         // Send data to the UI
         if (main_window_ != nullptr) {
-            main_window_->setImageAndOutput(QImage(input_img->data,
-                                                   input_img->cols,
-                                                   input_img->rows,
-                                                   input_img->step,
-                                                   QImage::Format_Grayscale8),
-                                                   output_data);
+            main_window_->setImage(QImage(input_img->data,
+                                          input_img->cols,
+                                          input_img->rows,
+                                          input_img->step,
+                                          QImage::Format_Grayscale8),
+                                          output_data);
         }
     }
 

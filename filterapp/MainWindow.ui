@@ -15,6 +15,21 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
      <widget class="sfv2::ImageView" name="imageView">
       <property name="autoFillBackground">
@@ -60,7 +75,31 @@
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="sfv2::SettingsForm" name="settingsForm"/>
+   <widget class="QWidget" name="widget">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="sfv2::SettingsForm" name="settingsForm" native="true"/>
+     </item>
+     <item>
+      <widget class="sfv2::OutputDataForm" name="outputDataForm" native="true"/>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <action name="actionSelectRoi">
    <property name="checkable">
@@ -100,6 +139,12 @@
    <class>sfv2::SettingsForm</class>
    <extends>QWidget</extends>
    <header>SettingsForm.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>sfv2::OutputDataForm</class>
+   <extends>QWidget</extends>
+   <header>OutputDataForm.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
