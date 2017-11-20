@@ -373,6 +373,26 @@ namespace sfv2 {
         pimpl_->s_.setValue("test/time-step", time_step);
     }
 
+    int FilterSettings::numEntropySamples() const
+    {
+        return pimpl_->s_.value("entropy/num-samples", 10).toInt();
+    }
+
+    void FilterSettings::setNumEntropySamples(int num)
+    {
+        pimpl_->s_.setValue("entropy/num-samples", num);
+    }
+
+    double FilterSettings::entropyScaleFactor() const
+    {
+        return pimpl_->s_.value("entropy/scale-factor", 50).toDouble();
+    }
+
+    void FilterSettings::setEntropyScaleFactor(double scale_factor)
+    {
+        pimpl_->s_.setValue("entropy/scale-factor", scale_factor);
+    }
+
     FilterSettings::Impl::Impl(const QString& file_name)
         : s_(file_name, QSettings::IniFormat)
         , test_mode_(false)

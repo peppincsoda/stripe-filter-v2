@@ -24,6 +24,7 @@ namespace sfv2 {
         ui->rightLabel->setText(QString::number(output_data.rightDist()));
         ui->measurementLabel->setText(QString::number(output_data.measurement()));
         ui->entropyLabel->setText(QString::number(output_data.entropy()));
+        ui->discretizedEntropyLabel->setText(QString::number(output_data.intEntropy()));
         ui->statusLabel->setText(QMetaEnum::fromType<decltype(output_data.status())>()
                                     .valueToKey(static_cast<int>(output_data.status())));
         ui->fpsLabel->setText(QString::number(output_data.fps()));

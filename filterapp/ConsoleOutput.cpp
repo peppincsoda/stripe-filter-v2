@@ -33,7 +33,7 @@ namespace sfv2 {
         std::cout << " L:" << std::setw(5) << std::right << data.leftDist()
                   << " R:" << std::setw(5) << std::right << data.rightDist()
                   << " OUTPUT:" << std::setw(5) << std::right << data.measurement()
-                  << " ENTROPY:" << std::setw(8) << std::right << data.entropy()
+                  << " ENTROPY:" << std::setw(5) << std::right << data.intEntropy()
                   << " STATUS:" << getFilterStatusStr(data.status()) << " | \r";
         return true;
     }

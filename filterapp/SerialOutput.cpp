@@ -62,14 +62,9 @@ namespace sfv2 {
 
     bool SerialOutput::write(const FilterOutputData& data)
     {
-        // Convert entropy to 32-bit float and copy it bit-by-bit to an integer
-        const auto f_entropy = static_cast<float>(data.entropy());
-        const auto i_entropy = *reinterpret_cast<const uint32_t*>(&f_entropy);
-
         uint16_t values[] = {static_cast<uint16_t>(data.measurement()),
                              static_cast<uint16_t>(data.status()),
-                             static_cast<uint16_t>(i_entropy >> 16),
-                             static_cast<uint16_t>(i_entropy & 0xFFFF)};
+                             static_cast<uint16_t>(data.intEntropy())};
         ModBus::preset_multiple_registers(slave_address_,
                                           data_address_,
                                           sizeof(values) / sizeof(values[0]),

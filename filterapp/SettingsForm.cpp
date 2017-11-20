@@ -56,6 +56,8 @@ namespace sfv2 {
         void onUseThresholdChanged();
         void onThresholdValueChanged();
         void onBlackObjectChanged();
+        void onNumEntropySamplesChanged();
+        void onEntropyScaleFactorChanged();
         void onPortNameChanged();
         void onBaudRateChanged();
         void onDataBitsChanged();
@@ -165,6 +167,12 @@ namespace sfv2 {
         connect(ui->blackObjectCheckBox, SIGNAL(toggled(bool)),
                 this, SLOT(onBlackObjectChanged()));
 
+        // Entropy
+        connect(ui->numEntropySamplesSpinBox, SIGNAL(valueChanged(int)),
+                this, SLOT(onNumEntropySamplesChanged()));
+        connect(ui->entropyScaleFactorDoubleSpinBox, SIGNAL(valueChanged(double)),
+                this, SLOT(onEntropyScaleFactorChanged()));
+
         // Serial port
         connect(ui->portNameLineEdit, SIGNAL(editingFinished()),
                 this, SLOT(onPortNameChanged()));
@@ -232,6 +240,9 @@ namespace sfv2 {
             ui->useThresholdCheckBox->setChecked(settings_->useThreshold());
             ui->thresholdValueSlider->setValue(settings_->thresholdValue());
             ui->blackObjectCheckBox->setChecked(settings_->blackObject());
+
+            ui->numEntropySamplesSpinBox->setValue(settings_->numEntropySamples());
+            ui->entropyScaleFactorDoubleSpinBox->setValue(settings_->entropyScaleFactor());
 
             ui->portNameLineEdit->setText(settings_->serialPortName());
             setCurrentIndexFromData(ui->baudRateComboBox, settings_->serialBaudRate());
@@ -328,6 +339,18 @@ namespace sfv2 {
     {
         if (settings_ != nullptr)
             settings_->setBlackObject(ui->blackObjectCheckBox->isChecked());
+    }
+
+    void SettingsForm::Impl::onNumEntropySamplesChanged()
+    {
+        if (settings_ != nullptr)
+            settings_->setNumEntropySamples(ui->numEntropySamplesSpinBox->value());
+    }
+
+    void SettingsForm::Impl::onEntropyScaleFactorChanged()
+    {
+        if (settings_ != nullptr)
+            settings_->setEntropyScaleFactor(ui->entropyScaleFactorDoubleSpinBox->value());
     }
 
     void SettingsForm::Impl::onPortNameChanged()

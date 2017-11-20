@@ -39,6 +39,7 @@ namespace sfv2 {
         , input_handler_(3, 1000, 30000, [this]() { return openInput(); })
         , output_handler_(3, 1000, 30000, [this]() { return openOutput(); })
         , main_window_(nullptr)
+        , entropy_avg_()
     {
         idle_timer_ = std::make_unique<QTimer>();
         connect(idle_timer_.get(), SIGNAL(timeout()), this, SLOT(onIdle()));
@@ -88,6 +89,7 @@ namespace sfv2 {
     void FilterApplication::resetTest()
     {
         test_timer_->start();
+        entropy_avg_.reset();
     }
 
     void FilterApplication::onIdle()
@@ -136,10 +138,18 @@ namespace sfv2 {
             }
         }
 
-        if (main_window_ != nullptr)
-            main_window_->setOutputData(output_data);
+        // Compute the average entropy
+        entropy_avg_.setLength(settings_->numEntropySamples());
+        entropy_avg_.addValue(output_data.entropy());
+        output_data.setEntropy(entropy_avg_.value());
+
+        // Discretize entropy value to fit into a single 16-bit integer Modbus register
+        output_data.setIntEntropy(static_cast<int>(output_data.entropy() * settings_->entropyScaleFactor()) & 0xFFFF);
 
         tryWriteOutput(output_data);
+
+        if (main_window_ != nullptr)
+            main_window_->setOutputData(output_data);
     }
 
     void FilterApplication::closeInput()

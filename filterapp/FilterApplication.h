@@ -2,6 +2,7 @@
 #define FILTERAPPLICATION_H
 
 #include "RetryHandler.h"
+#include "AverageCalculator.h"
 
 #include <QObject>
 
@@ -82,6 +83,8 @@ namespace sfv2 {
         RetryHandler output_handler_;
 
         MainWindow* main_window_;
+
+        AverageCalculator<double> entropy_avg_;
     };
 
 }

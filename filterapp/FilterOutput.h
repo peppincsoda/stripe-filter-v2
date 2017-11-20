@@ -35,6 +35,10 @@ namespace sfv2 {
         double entropy() const;
         void setEntropy(double entropy);
 
+        /// Scaled and discretized entropy value
+        int intEntropy() const;
+        void setIntEntropy(int int_entropy);
+
         int fps() const;
         void setFps(int fps);
 
@@ -48,6 +52,7 @@ namespace sfv2 {
         int measurement_;
 
         double entropy_;
+        int int_entropy_;
 
         int fps_;
     };

@@ -43,6 +43,8 @@ namespace sfv2 {
         Q_PROPERTY(double TestMaxMeasurement READ testMaxMeasurement WRITE setTestMaxMeasurement)
         Q_PROPERTY(double TestMeasurementStep READ testMeasurementStep WRITE setTestMeasurementStep)
         Q_PROPERTY(int TestTimeStep READ testTimeStep WRITE setTestTimeStep)
+        Q_PROPERTY(int NumEntropySamples READ numEntropySamples WRITE setNumEntropySamples)
+        Q_PROPERTY(double EntropyScaleFactor READ entropyScaleFactor WRITE setEntropyScaleFactor)
     public:
         enum InputType
         {
@@ -154,6 +156,12 @@ namespace sfv2 {
 
         int testTimeStep() const;
         void setTestTimeStep(int time_step);
+
+        int numEntropySamples() const;
+        void setNumEntropySamples(int num);
+
+        double entropyScaleFactor() const;
+        void setEntropyScaleFactor(double scale_factor);
 
     Q_SIGNALS:
         void inputTypeChanged();

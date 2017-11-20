@@ -55,6 +55,16 @@ namespace sfv2 {
         entropy_ = entropy;
     }
 
+    int FilterOutputData::intEntropy() const
+    {
+        return int_entropy_;
+    }
+
+    void FilterOutputData::setIntEntropy(int int_entropy)
+    {
+        int_entropy_ = int_entropy;
+    }
+
     int FilterOutputData::fps() const
     {
         return fps_;
