@@ -127,10 +127,14 @@ namespace sfv2 {
         ui->setupUi(this);
 
         // Input/Output
-        addEnumValues<FilterSettings::InputType>(ui->inputTypeComboBox);
+        ui->inputTypeComboBox->addItem(tr("Webcam"), FilterSettings::CVInput);
+        ui->inputTypeComboBox->addItem(tr("Basler camera"), FilterSettings::BaslerInput);
+        ui->inputTypeComboBox->addItem(tr("No input"), FilterSettings::UnknownInput);
         connect(ui->inputTypeComboBox, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(onInputTypeChanged()));
-        addEnumValues<FilterSettings::OutputType>(ui->outputTypeComboBox);
+        ui->outputTypeComboBox->addItem(tr("Console"), FilterSettings::ConsoleOutput);
+        ui->outputTypeComboBox->addItem(tr("Serial line"), FilterSettings::SerialOutput);
+        ui->outputTypeComboBox->addItem(tr("No output"), FilterSettings::UnknownOutput);
         connect(ui->outputTypeComboBox, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(onOutputTypeChanged()));
         connect(ui->optimizeRoiCheckBox, SIGNAL(toggled(bool)),
