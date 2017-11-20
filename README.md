@@ -155,10 +155,9 @@ Restarting if needed:
 
 ### Start with X
 
-To start the application automatically whenever the graphical desktop is launched create the following file:
+To start the application automatically whenever the graphical desktop is launched you can create `~/.config/autostart/filterapp.desktop` with the following content:
 
 ```
-~ $ cat .config/autostart/filterapp.desktop
 [Desktop Entry]
 Name=FilterApp
 Exec=lxterminal -e /home/pi/work/build/bin/filterapp --settings-file=/home/pi/work/settings.ini --gui
