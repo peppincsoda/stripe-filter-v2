@@ -6,7 +6,9 @@ Table of contents
 
   * [Introduction](#introduction)
   * [Building on Linux](#building-on-linux)
+    * [Updating manually](#updating-manually)
     * [Installing as a service](#installing-as-a-service)
+    * [Start with X](#start-with-x)
   * [Building on Windows](#building-on-windows)
   * [Usage](#usage)
   * [Known bugs](#known-bugs)
@@ -69,32 +71,32 @@ Install all dependencies: CMake, Qt5, OpenCV
 Install Basler Pylon SDK to `/opt`:
 
 ```bash
-~ $ wget https://www.baslerweb.com/fp-1496746643/media/downloads/software/pylon_software/pylon-5.0.9.10389-armhf.tar.gz
-~ $ tar xvvf pylon-5.0.9.10389-armhf.tar.gz
-~ $ cd pylon-5.0.9.10389-armhf
-~/pylon-5.0.9.10389-armhf $ sudo tar -C /opt -xzf pylonSDK-5.0.9.10389-armhf.tar.gz
-~/pylon-5.0.9.10389-armhf $ cd
+~/work $ wget https://www.baslerweb.com/fp-1496746643/media/downloads/software/pylon_software/pylon-5.0.9.10389-armhf.tar.gz
+~/work $ tar xvvf pylon-5.0.9.10389-armhf.tar.gz
+~/work $ cd pylon-5.0.9.10389-armhf
+~/work/pylon-5.0.9.10389-armhf $ sudo tar -C /opt -xzf pylonSDK-5.0.9.10389-armhf.tar.gz
+~/work/pylon-5.0.9.10389-armhf $ cd
 ```
 
 Clone this repository:
 
 ```bash
-~ $ git clone https://github.com/peppincsoda/stripe-filter-v2
+~/work $ git clone https://github.com/peppincsoda/stripe-filter-v2
 ```
 
 And build it with CMake:
 
 ```bash
-~ $ mkdir build; cd build
-~/build $ export PYLON_ROOT=/opt/pylon5
-~/build $ cmake -DCMAKE_BUILD_TYPE=Debug ../stripe-filter-v2
-~/build $ make
+~/work $ mkdir build; cd build
+~/work/build $ export PYLON_ROOT=/opt/pylon5
+~/work/build $ cmake -DCMAKE_BUILD_TYPE=Debug ../stripe-filter-v2
+~/work/build $ make
 ```
 
 Run the application:
 
 ```bash
-~/build $ bin/filterapp --gui
+~/work/build $ bin/filterapp --settings-file=~/work/settings.ini --gui
 ```
 
 You can press Ctrl+C in the terminal or close the main window to exit.
@@ -102,16 +104,31 @@ You can press Ctrl+C in the terminal or close the main window to exit.
 If you do not have a Basler camera, you still can test the application by setting the `PYLON_CAMEMU` environment variable:
 
 ```bash
-~/build $ export PYLON_CAMEMU=1
-~/build $ bin/filterapp --gui
+~/work/build $ export PYLON_CAMEMU=1
+~/work/build $ bin/filterapp --settings-file=~/work/settings.ini --gui
 ```
+
+### Updating manually
+
+1. Stop the application or service.
+1. Update the sources:
+   ```
+   ~ $ cd work/stripe-filter-v2
+   ~/work/stripe-filter-v2 $ git pull
+   ```
+1. Build:
+   ```
+   ~/work/stripe-filter-v2 $ cd ../build
+   ~/work/build $ make
+   ```
+1. Start the application or service.
 
 ### Installing as a service
 
 You can have the application started automatically every time the system is booted up:
 
 ```bash
-~ $ sudo cp /home/pi/stripe-filter-v2/filterapp/filterapp.service /etc/systemd/system/filterapp.service
+~ $ sudo cp /home/pi/work/stripe-filter-v2/filterapp/filterapp.service /etc/systemd/system/filterapp.service
 ~ $ sudo chmod 644 /etc/systemd/system/filterapp.service
 ~ $ sudo systemctl daemon-reload
 ~ $ sudo systemctl enable filterapp.service
@@ -134,6 +151,18 @@ Restarting if needed:
 
 ```bash
 ~ $ sudo systemctl restart filterapp.service
+```
+
+### Start with X
+
+To start the application automatically whenever the graphical desktop is launched create the following file:
+
+```
+~ $ cat .config/autostart/filterapp.desktop
+[Desktop Entry]
+Name=FilterApp
+Exec=lxterminal -e /home/pi/work/build/bin/filterapp --settings-file=/home/pi/work/settings.ini --gui
+Type=application
 ```
 
 ## Building on Windows
@@ -194,7 +223,7 @@ Address Offset | Number of 16-bit registers | Value
 --- | --- | ---
 +0 | 1 | The measurement value.
 +1 | 1 | The status of the sensor. (See below for status codes.)
-+2 | 2 | The entropy of the histogram of the ROI given as a 32-bit float value. (Used for contrast detection.)
++2 | 1 | The entropy of the histogram. (Used for contrast detection.)
 
 Status codes:
 
@@ -211,5 +240,4 @@ Numeric value | Status string on the console | Meaning
 
 MIT
 
-If you have any questions, ideas, suggestions, or need help with this project, feel free to contact me.
-
+If you have any questions, ideas, suggestions, contact me.
