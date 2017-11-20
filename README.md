@@ -208,11 +208,21 @@ and `--settings-file` which receives the path to the file that will hold all par
   + *Use Threshold*, *Threshold value*: Whether to apply binary thresholding and the value of the threshold.
   + *Black object*: When turned on, the search will look for the first black pixels from the left and right
     end of the centerline in the ROI, otherwise it will look for the first white pixels.
++ *Entropy*:
+  + *Entropy samples*: How many values to compute the average over.
+  + *Scale factor*: The average is multiplied with this factor before discretizing into a 16-bit value.
 + *Serial Port*: The usual serial port settings.
   + *Port name*: `COM1`, `COM2`, etc. on Windows and `ttyS0`, `ttyS1`, `ttyUSB0`, etc. on Linux.
 + *Modbus*:
   + *Slave address*: The address of the Modbus slave device (the PLC).
   + *Data address*: The address of the first register the program will send the results.
++ *Test*:
+  + *Test Mode*: Turn test mode ON/OFF.
+  + *Output status*: The status to send to the output.
+  + *Min value*, *Max value*, *Value step*, *Time step*: Both the measurement and entropy values will
+    increase from *Min value* to *Max value* by *Value step* steps on each *Time step*. The entropy value will be processed
+    further.
+  + *Reset timer*: Reset all test outputs to their initial values.
 
 ### Modbus output
 
