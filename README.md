@@ -75,7 +75,7 @@ Install Basler Pylon SDK to `/opt`:
 ~/work $ tar xvvf pylon-5.0.9.10389-armhf.tar.gz
 ~/work $ cd pylon-5.0.9.10389-armhf
 ~/work/pylon-5.0.9.10389-armhf $ sudo tar -C /opt -xzf pylonSDK-5.0.9.10389-armhf.tar.gz
-~/work/pylon-5.0.9.10389-armhf $ cd
+~/work/pylon-5.0.9.10389-armhf $ cd ~/work
 ```
 
 Clone this repository:
